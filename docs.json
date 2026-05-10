@@ -13,6 +13,7 @@
     "tabs": [
       {
         "tab": "Início",
+        "icon": "house",
         "groups": [
           {
             "group": "Comece Aqui",
@@ -30,7 +31,8 @@
         ]
       },
       {
-        "tab": "Desenvolvedores",
+        "tab": "Desenvolvedor",
+        "icon": "code",
         "groups": [
           {
             "group": "Fundamentos",
@@ -67,14 +69,13 @@
         ]
       },
       {
-        "tab": "Ferramentas AI",
+        "tab": "Ferramentas IA",
+        "icon": "microchip-ai",
         "groups": [
           {
-            "group": "Extensões",
+            "group": "Inteligência Artificial",
             "pages": [
-              "ai-tools/cursor",
-              "ai-tools/windsurf",
-              "ai-tools/claude-code"
+              "ai-tools/hub"
             ]
           }
         ]

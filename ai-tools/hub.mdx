@@ -1,0 +1,82 @@
+---
+title: "Documentação com IA"
+description: "Escolha sua inteligência artificial favorita e gere documentações completas para a API da Sync Pay."
+icon: "microchip-ai"
+---
+
+<div className="custom-container">
+  <div className="flex flex-col gap-2">
+    <h1 className="text-4xl font-bold max-w-2xl">
+      Hub de <span className="text-primary">Inteligência Artificial</span>
+    </h1>
+    <p className="text-foreground/70 text-sm max-w-2xl">
+      Facilite sua integração utilizando o poder das IAs. Selecione uma das opções abaixo para obter instruções de como treinar a IA com nossa documentação e gerar códigos de integração personalizados.
+    </p>
+    
+    <div className="custom-divider" />
+    
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="flex flex-col gap-3 p-4 border border-foreground/10 rounded-xl bg-foreground/5">
+        <div className="flex items-center gap-2">
+          <Icon icon="sparkles" className="text-primary" />
+          <span className="font-bold">ChatGPT</span>
+        </div>
+        <p className="text-xs text-foreground/70">Ideal para explicações conceituais e geração de scripts rápidos em Python ou Node.js.</p>
+        <div className="badge-custom text-[10px]">Recomendado</div>
+      </div>
+      
+      <div className="flex flex-col gap-3 p-4 border border-foreground/10 rounded-xl bg-foreground/5">
+        <div className="flex items-center gap-2">
+          <Icon icon="brain" className="text-primary" />
+          <span className="font-bold">Claude 3.5</span>
+        </div>
+        <p className="text-xs text-foreground/70">Excelente para análise de arquivos OpenAPI e criação de arquiteturas complexas.</p>
+        <div className="badge-custom text-[10px]">Alta Precisão</div>
+      </div>
+
+      <div className="flex flex-col gap-3 p-4 border border-foreground/10 rounded-xl bg-foreground/5">
+        <div className="flex items-center gap-2">
+          <Icon icon="code" className="text-primary" />
+          <span className="font-bold">v0.dev</span>
+        </div>
+        <p className="text-xs text-foreground/70">A melhor escolha para gerar interfaces de checkout e dashboards usando React/Tailwind.</p>
+        <div className="badge-custom text-[10px]">Frontend</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+## Como funciona?
+
+Siga os passos abaixo para começar a documentar com IA:
+
+<Steps>
+  <Step title="Baixe o OpenAPI">
+    Faça o download do nosso arquivo `openapi.json` na seção de Referência da API.
+  </Step>
+  <Step title="Upload para a IA">
+    Envie o arquivo para o chat da sua IA escolhida e peça para ela analisar os endpoints.
+  </Step>
+  <Step title="Gere seu Código">
+    Solicite exemplos de integração: *"Gere um código em Node.js para criar um pagamento PIX usando a API da Sync Pay"*.
+  </Step>
+</Steps>
+
+<div className="custom-container">
+  <div className="flex flex-col gap-2">
+    <h2 className="text-2xl font-bold">Prompt Sugerido</h2>
+    <p className="text-foreground/70 text-sm">
+      Copie e cole o prompt abaixo para obter os melhores resultados com qualquer IA:
+    </p>
+    <div className="custom-divider" />
+    <div className="bg-foreground/5 p-4 rounded-lg border border-foreground/10">
+      <code className="text-xs text-foreground/80">
+        "Você é um especialista em integrações de pagamentos. Analise o arquivo openapi.json da Sync Pay e me ajude a criar uma integração robusta para [seu caso de uso]. Foque em segurança e tratamento de erros."
+      </code>
+    </div>
+  </div>
+</div>
+
+<Note>
+  Lembre-se de nunca compartilhar suas chaves de API reais com chats de IA públicos. Use sempre variáveis de ambiente.
+</Note>
