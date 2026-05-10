@@ -4,8 +4,8 @@
   "name": "Sync Pay Docs",
   "colors": {
     "primary": "#FF5C00",
-    "light": "#FF8540",
-    "dark": "#CC4A00"
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
   },
   "favicon": "/favicon.svg",
   "navigation": {
