@@ -1,0 +1,51 @@
+---
+title: "Visão Geral"
+description: "Visão geral da API Eyo Wallet e como começar"
+icon: "eye"
+---
+
+A API Eyo Wallet permite que você integre pagamentos PIX, saques e gerenciamento de carteira digital em suas aplicações.
+
+## Base URL
+
+Todas as requisições devem ser feitas para:
+
+```
+https://api.eyowallet.ru
+```
+
+## Autenticação
+
+A API utiliza autenticação baseada em API Keys. Inclua sua API Key no header da requisição:
+
+```
+X-API-Key: sua_api_key_aqui
+```
+
+Ou usando o header Authorization:
+
+```
+Authorization: Bearer sua_api_key_aqui
+```
+
+## Estrutura de Resposta
+
+Todas as respostas seguem um formato padrão:
+
+- **Sucesso**: `{ "success": true, "data": {...} }`
+- **Erro**: `{ "success": false, "error": "...", "message": "..." }`
+
+## Rate Limiting
+
+A API implementa rate limiting para garantir estabilidade e segurança. Consulte a seção [Rate Limiting](/api-reference/rate-limiting) para detalhes completos.
+
+## Próximos Passos
+
+<CardGroup cols={2}>
+  <Card title="Rate Limiting" icon="clock" href="/api-reference/rate-limiting">
+    Saiba como funciona o rate limiting
+  </Card>
+  <Card title="Pagamentos" icon="credit-card" href="/api-reference/endpoint/payments/create">
+    Comece a criar transações PIX
+  </Card>
+</CardGroup>

@@ -1,133 +1,124 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
-icon: 'star'
+title: "Introdução"
+description: "Documentação oficial da Eyo Wallet"
+icon: book
 ---
 
-## Setting up
+Somos a plataforma de pagamentos digitais que oferece **anonimato** e **privacidade**, **sem KYC**, **sem MEDs** e acessibilidade para **qualquer idade**. Aqui você encontrará tudo o que precisa para integrar pagamentos PIX, gerenciar sua carteira digital e automatizar seu negócio.
 
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
+<CardGroup cols={2}>
   <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
+    title="Sobre Nós"
+    icon="info"
+    href="/about-us"
   >
-    Edit your docs locally and preview them in real time.
+    Conheça a Eyo Wallet, nossa missão e diferenciais exclusivos.
   </Card>
   <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
+    title="Referência da API"
+    icon="dev"
+    href="/api-reference/overview"
   >
-    Customize the design and colors of your site to match your brand.
+    Comece a integrar nossa API em seus sistemas.
   </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
+</CardGroup>
 
-## Create beautiful pages
+---
 
-Everything you need to create world-class documentation.
+## Por que Eyo Wallet?
 
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
+<CardGroup cols={2}>
+  <Card title="Privacidade Total" icon="user-secret">
+    Transações anônimas sem exposição de dados pessoais.
   </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
+  <Card title="Sem KYC" icon="id-card-clip">
+    Cadastro simplificado, comece a usar imediatamente.
   </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
+  <Card title="Sem MEDs" icon="ban">
+    Livre de chargebacks e estornos indevidos.
   </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
+  <Card title="Para Todos" icon="users">
+    Acessível para qualquer idade, incluindo menores de 18.
   </Card>
-</Columns>
+</CardGroup>
 
-## Make your content agent ready
+<Tip>
+  Quer saber mais sobre nossos diferenciais? Acesse a página [Sobre Nós](/about-us) para conhecer todos os benefícios da Eyo Wallet.
+</Tip>
 
-Make your docs work for humans and AI agents alike.
+---
 
-<Columns cols={2}>
+## Começando
+
+Escolha por onde deseja começar sua jornada com a Eyo Wallet.
+
+<Steps>
+  <Step title="Crie sua conta">
+    Acesse [eyowallet.ru](https://eyowallet.ru) e crie sua conta gratuitamente.
+  </Step>
+  <Step title="Obtenha sua API Key">
+    Acesse a [Dashboard](https://eyowallet.ru/dashboard/credentials) para configurar suas credenciais.
+  </Step>
+  <Step title="Integre e automatize">
+    Use nossa [API](/api-reference/overview) para automatizar seus ganhos.
+  </Step>
+</Steps>
+
+---
+
+
+## Referência da API
+
+Documentação completa de todos os endpoints disponíveis.
+
+<CardGroup cols={2}>
   <Card
-    title="Prompt component"
-    icon="robot"
-    href="/agent-ready/prompt"
-  >
-    Embed shareable AI prompts readers can copy or open in Cursor.
-  </Card>
-  <Card
-    title="Visibility"
+    title="Visão Geral"
     icon="eye"
-    href="/agent-ready/visibility"
+    href="/api-reference/overview"
   >
-    Show different content to humans and agents reading your docs.
+    Entenda como funciona a API e como autenticar suas requisições.
   </Card>
   <Card
-    title="Contextual menu"
-    icon="bolt"
-    href="/agent-ready/contextual"
+    title="Pagamentos"
+    icon="credit-card"
+    href="/api-reference/endpoint/payments/create"
   >
-    Give readers one-click access to Claude, ChatGPT, Cursor, and more.
+    Crie e gerencie transações PIX.
   </Card>
   <Card
-    title="AI coding tools"
-    icon="wand-magic-sparkles"
-    href="/ai-tools/claude-code"
+    title="Saques"
+    icon="money-bill-transfer"
+    href="/api-reference/endpoint/withdraws/create"
   >
-    Set up Claude Code, Cursor, or Windsurf with Mintlify's skill.
+    Solicite saques para sua conta bancária.
   </Card>
-</Columns>
+  <Card
+    title="Transferências"
+    icon="arrow-right-arrow-left"
+    href="/api-reference/endpoint/transfers/internal"
+  >
+    Transfira saldo entre usuários Eyo Wallet.
+  </Card>
+</CardGroup>
 
-## Need inspiration?
+---
 
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+## Precisa de ajuda?
+
+<CardGroup cols={2}>
+  <Card
+    title="Suporte no Telegram"
+    icon="telegram"
+    href="https://t.me/eyowallet"
+  >
+    Junte-se à nosso canal para obter ajuda e tirar dúvidas.
+  </Card>
+  <Card
+    title="Sobre Nós"
+    icon="info"
+    href="/about-us"
+  >
+    Conheça mais sobre a Eyo Wallet e nosso ecossistema.
+  </Card>
+</CardGroup>

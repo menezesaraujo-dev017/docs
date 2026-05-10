@@ -1,54 +1,75 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
-    "license": {
-      "name": "MIT"
-    },
-    "version": "1.0.0"
+    "title": "Eyo Wallet API",
+    "description": "API para integração com a Eyo Wallet - Plataforma de pagamentos PIX para desenvolvedores e empresas",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Eyo Wallet",
+      "url": "https://eyowallet.ru"
+    }
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://api.eyowallet.ru",
+      "description": "Servidor de Produção"
     }
   ],
   "security": [
     {
-      "bearerAuth": []
+      "apiKeyAuth": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "Payments",
+      "description": "Endpoints para criar e gerenciar pagamentos PIX"
+    },
+    {
+      "name": "Withdraws",
+      "description": "Endpoints para criar e gerenciar saques via PIX"
+    },
+    {
+      "name": "Transfers",
+      "description": "Endpoints para transferências internas entre contas Eyo Wallet"
+    },
+    {
+      "name": "User",
+      "description": "Endpoints para informações do usuário e configurações"
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+    "/api/v1/payment/create": {
+      "post": {
+        "operationId": "createPayment",
+        "summary": "Criar Pagamento",
+        "description": "Cria uma nova transação PIX e retorna um QR Code para pagamento",
+        "tags": [
+          "Payments"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePaymentRequest"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Pagamento criado com sucesso",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
+                  "$ref": "#/components/schemas/CreatePaymentResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
+            "description": "Erro de validação",
             "content": {
               "application/json": {
                 "schema": {
@@ -56,35 +77,19 @@
                 }
               }
             }
-          }
-        }
-      },
-      "post": {
-        "description": "Creates a new plant in the store",
-        "requestBody": {
-          "description": "Plant to add to the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewPlant"
-              }
-            }
           },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "plant response",
+          "401": {
+            "description": "API Key inválida ou ausente",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }
           },
-          "400": {
-            "description": "unexpected error",
+          "429": {
+            "description": "Rate limit excedido",
             "content": {
               "application/json": {
                 "schema": {
@@ -96,32 +101,356 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/api/v1/payment/get/{id}": {
+      "get": {
+        "operationId": "getPayment",
+        "summary": "Buscar Pagamento",
+        "description": "Consulta os detalhes de uma transação PIX específica. Este endpoint sincroniza automaticamente o status com o provedor de pagamento.",
+        "tags": [
+          "Payments"
+        ],
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of plant to delete",
             "required": true,
+            "description": "ID único da transação de pagamento",
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string"
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "Pagamento encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetPaymentResponse"
+                }
+              }
+            }
           },
-          "400": {
-            "description": "unexpected error",
+          "404": {
+            "description": "Pagamento não encontrado",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/payment/list": {
+      "get": {
+        "operationId": "listPayments",
+        "summary": "Listar Pagamentos",
+        "description": "Lista todas as transações PIX do usuário com filtros e paginação",
+        "tags": [
+          "Payments"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filtrar por status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "ACTIVE",
+                "COMPLETED",
+                "FAILED"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Número máximo de resultados (máximo 100)",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Número de resultados a pular (para paginação)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de pagamentos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListPaymentsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/withdraw/create": {
+      "post": {
+        "operationId": "createWithdraw",
+        "summary": "Criar Saque",
+        "description": "Cria um novo saque para transferir dinheiro via PIX. O saldo é debitado imediatamente.",
+        "tags": [
+          "Withdraws"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateWithdrawRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saque criado com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateWithdrawResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação ou saldo insuficiente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/withdraw/crypto": {
+      "post": {
+        "operationId": "createCryptoWithdraw",
+        "summary": "Criar Saque Crypto",
+        "description": "Cria um novo saque em criptomoeda (USDT BEP20).",
+        "tags": [
+          "Withdraws"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCryptoWithdrawRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Saque crypto adicionado à fila",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateCryptoWithdrawResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Erro de validação, saldo insuficiente ou wallet inválida",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/withdraw/get/{id}": {
+      "get": {
+        "operationId": "getWithdraw",
+        "summary": "Buscar Saque",
+        "description": "Consulta os detalhes de um saque específico",
+        "tags": [
+          "Withdraws"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID único do saque",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Saque encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetWithdrawResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Saque não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/withdraw/list": {
+      "get": {
+        "operationId": "listWithdraws",
+        "summary": "Listar Saques",
+        "description": "Lista todos os saques do usuário com filtros e paginação",
+        "tags": [
+          "Withdraws"
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Filtrar por status",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "COMPLETED",
+                "FAILED"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Número máximo de resultados (máximo 100)",
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Número de resultados a pular (para paginação)",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de saques",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListWithdrawsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/transfer/internal": {
+      "post": {
+        "operationId": "internalTransfer",
+        "summary": "Transferência Interna",
+        "description": "Transfere saldo para outra conta Eyo Wallet usando o email. Transferências internas são gratuitas e instantâneas.",
+        "tags": [
+          "Transfers"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InternalTransferRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Transferência realizada com sucesso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalTransferResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Saldo insuficiente ou transferência para si mesmo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuário não encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/user/balance": {
+      "get": {
+        "operationId": "getBalance",
+        "summary": "Consultar Saldo",
+        "description": "Obtém informações detalhadas sobre saldo, estatísticas e limites da conta",
+        "tags": [
+          "User"
+        ],
+        "responses": {
+          "200": {
+            "description": "Informações do saldo",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BalanceResponse"
                 }
               }
             }
@@ -131,86 +460,1104 @@
     }
   },
   "webhooks": {
-    "/plant/webhook": {
+    "payment.approved": {
       "post": {
-        "description": "Information about a new plant added to the store",
+        "summary": "Pagamento Aprovado",
+        "description": "Enviado quando um pagamento PIX é confirmado e aprovado",
         "requestBody": {
-          "description": "Plant added to the store",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/PaymentApprovedWebhook"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Return a 200 status to indicate that the data was received successfully"
+            "description": "Webhook recebido com sucesso"
+          }
+        }
+      }
+    },
+    "payment.expired": {
+      "post": {
+        "summary": "Pagamento Expirado",
+        "description": "Enviado quando um pagamento expira sem ser pago",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentExpiredWebhook"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook recebido com sucesso"
+          }
+        }
+      }
+    },
+    "payment.refunded": {
+      "post": {
+        "summary": "Pagamento Reembolsado",
+        "description": "Enviado quando um pagamento é reembolsado",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PaymentRefundedWebhook"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook recebido com sucesso"
+          }
+        }
+      }
+    },
+    "withdrawal.completed": {
+      "post": {
+        "summary": "Saque Processado",
+        "description": "Enviado quando um saque é processado com sucesso",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawalCompletedWebhook"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook recebido com sucesso"
+          }
+        }
+      }
+    },
+    "withdrawal.failed": {
+      "post": {
+        "summary": "Saque Falhou",
+        "description": "Enviado quando um saque falha",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawalFailedWebhook"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook recebido com sucesso"
           }
         }
       }
     }
   },
   "components": {
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "API Key obtida no painel da Eyo Wallet"
+      }
+    },
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
+      "CreatePaymentRequest": {
         "type": "object",
+        "required": [
+          "value"
+        ],
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
+          "value": {
+            "type": "number",
+            "description": "Valor da transação em reais. Mínimo: R$ 3,00. Máximo: R$ 5.000,00 por transação.",
+            "minimum": 3,
+            "maximum": 2000
           },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
+          "description": {
+            "type": "string",
+            "description": "Descrição opcional da transação"
+          },
+          "coverFee": {
+            "type": "boolean",
+            "default": false,
+            "description": "Se true, o valor informado é o valor líquido que você deseja receber. A taxa será adicionada ao valor total."
+          },
+          "splitUser": {
+            "type": "string",
+            "description": "Email de outro usuário Eyo Wallet para dividir o pagamento"
+          },
+          "splitTax": {
+            "type": "number",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Porcentagem do valor a ser transferida para o usuário de split"
           }
         }
       },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
-              }
-            }
-          }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+      "CreatePaymentResponse": {
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "success": {
+            "type": "boolean"
           },
           "message": {
             "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "ID único do pagamento"
+              },
+              "transactionId": {
+                "type": "string",
+                "description": "ID da transação na gateway"
+              },
+              "value": {
+                "type": "integer",
+                "description": "Valor total em centavos"
+              },
+              "valueInReais": {
+                "type": "number",
+                "description": "Valor total em reais"
+              },
+              "netValue": {
+                "type": "integer",
+                "description": "Valor líquido após dedução da taxa, em centavos"
+              },
+              "fee": {
+                "type": "integer",
+                "description": "Taxa cobrada em centavos"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "ACTIVE",
+                  "COMPLETED",
+                  "FAILED"
+                ]
+              },
+              "qrcodeUrl": {
+                "type": "string",
+                "description": "QR Code em formato base64 (data URI)"
+              },
+              "copyPaste": {
+                "type": "string",
+                "description": "Código PIX para copiar e colar"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
           }
         }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+      },
+      "GetPaymentResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "statusUpdated": {
+            "type": "boolean",
+            "description": "Indica se o status foi atualizado durante a consulta"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "transactionId": {
+                "type": "string"
+              },
+              "value": {
+                "type": "integer"
+              },
+              "netValue": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "ACTIVE",
+                  "COMPLETED",
+                  "FAILED"
+                ]
+              },
+              "qrCode": {
+                "type": "string",
+                "nullable": true
+              },
+              "description": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "ListPaymentsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "payments": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PaymentItem"
+                }
+              },
+              "pagination": {
+                "$ref": "#/components/schemas/Pagination"
+              },
+              "statistics": {
+                "$ref": "#/components/schemas/PaymentsStatistics"
+              }
+            }
+          }
+        }
+      },
+      "PaymentItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "correlationID": {
+            "type": "string"
+          },
+          "value": {
+            "type": "integer"
+          },
+          "netValue": {
+            "type": "integer"
+          },
+          "fee": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "ACTIVE",
+              "COMPLETED",
+              "FAILED"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CreateWithdrawRequest": {
+        "type": "object",
+        "required": [
+          "amount",
+          "pixKey",
+          "pixKeyType"
+        ],
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Valor do saque em reais. Mínimo: R$ 7,00",
+            "minimum": 7
+          },
+          "pixKey": {
+            "type": "string",
+            "description": "Chave PIX do destinatário"
+          },
+          "pixKeyType": {
+            "type": "string",
+            "enum": [
+              "CPF",
+              "CNPJ",
+              "EMAIL",
+              "PHONE",
+              "RANDOM"
+            ],
+            "description": "Tipo da chave PIX"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descrição opcional do saque"
+          },
+          "coverFee": {
+            "type": "boolean",
+            "default": false,
+            "description": "Se true, o valor informado é o valor líquido que será enviado"
+          },
+          "verificationCode": {
+            "type": "string",
+            "description": "Código de verificação se a segurança de transferências estiver ativada"
+          },
+          "splitUser": {
+            "type": "string",
+            "description": "Email de outro usuário Eyo Wallet para dividir o saque"
+          },
+          "splitTax": {
+            "type": "number",
+            "default": 50,
+            "minimum": 1,
+            "maximum": 100,
+            "description": "Porcentagem do valor a ser transferida para o usuário de split"
+          }
+        }
+      },
+      "CreateWithdrawResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "value": {
+                "type": "integer",
+                "description": "Valor total em centavos"
+              },
+              "fee": {
+                "type": "integer",
+                "description": "Taxa em centavos"
+              },
+              "sent": {
+                "type": "integer",
+                "description": "Valor líquido enviado em centavos"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "COMPLETED",
+                  "FAILED"
+                ]
+              },
+              "pixKey": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "CreateCryptoWithdrawRequest": {
+        "type": "object",
+        "required": [
+          "amount",
+          "wallet"
+        ],
+        "properties": {
+          "amount": {
+            "type": "number",
+            "description": "Valor do saque em reais. Mínimo: R$ 20,00. Máximo: R$ 3.000,00",
+            "minimum": 20,
+            "maximum": 3000
+          },
+          "wallet": {
+            "type": "string",
+            "description": "Endereço da wallet BEP20 (formato: 0x seguido de 40 caracteres hexadecimais)",
+            "pattern": "^0x[a-fA-F0-9]{40}$"
+          },
+          "description": {
+            "type": "string",
+            "description": "Descrição opcional do saque"
+          }
+        }
+      },
+      "CreateCryptoWithdrawResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "ID único do saque"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "CRYPTO_BEP20"
+                ],
+                "description": "Tipo do saque"
+              },
+              "currency": {
+                "type": "string",
+                "enum": [
+                  "USDT"
+                ],
+                "description": "Moeda"
+              },
+              "network": {
+                "type": "string",
+                "enum": [
+                  "BEP20"
+                ],
+                "description": "Rede blockchain"
+              },
+              "value": {
+                "type": "integer",
+                "description": "Valor em centavos"
+              },
+              "valueInReais": {
+                "type": "number",
+                "description": "Valor em reais"
+              },
+              "fee": {
+                "type": "integer",
+                "description": "Taxa em centavos (6% + R$ 2,00)"
+              },
+              "feeInReais": {
+                "type": "number",
+                "description": "Taxa em reais"
+              },
+              "wallet": {
+                "type": "string",
+                "description": "Endereço da wallet BEP20"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "QUEUED",
+                  "PROCESSING",
+                  "COMPLETED",
+                  "FAILED"
+                ],
+                "description": "Status do saque"
+              },
+              "jobId": {
+                "type": "string",
+                "description": "ID do job na fila de processamento"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "GetWithdrawResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "correlationID": {
+                "type": "string"
+              },
+              "value": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "PENDING",
+                  "COMPLETED",
+                  "FAILED"
+                ]
+              },
+              "pixKey": {
+                "type": "string"
+              },
+              "pixKeyType": {
+                "type": "string"
+              },
+              "transactionId": {
+                "type": "string"
+              },
+              "fee": {
+                "type": "integer"
+              },
+              "sent": {
+                "type": "integer"
+              },
+              "completedAt": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+              },
+              "failedAt": {
+                "type": "string",
+                "format": "date-time",
+                "nullable": true
+              },
+              "failureReason": {
+                "type": "string",
+                "nullable": true
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "updatedAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "ListWithdrawsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "withdraws": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/WithdrawItem"
+                }
+              },
+              "pagination": {
+                "$ref": "#/components/schemas/Pagination"
+              },
+              "statistics": {
+                "$ref": "#/components/schemas/WithdrawsStatistics"
+              }
+            }
+          }
+        }
+      },
+      "WithdrawItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "correlationID": {
+            "type": "string"
+          },
+          "value": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING",
+              "COMPLETED",
+              "FAILED"
+            ]
+          },
+          "pixKey": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "InternalTransferRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "value"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email do destinatário (conta Eyo Wallet ativa)"
+          },
+          "value": {
+            "type": "number",
+            "description": "Valor da transferência em reais (mínimo R$ 0,01)",
+            "minimum": 0.01
+          },
+          "description": {
+            "type": "string",
+            "description": "Descrição opcional da transferência"
+          }
+        }
+      },
+      "InternalTransferResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "value": {
+                "type": "integer",
+                "description": "Valor em centavos"
+              },
+              "valueInReais": {
+                "type": "number",
+                "description": "Valor em reais"
+              },
+              "recipientEmail": {
+                "type": "string"
+              },
+              "recipientName": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              }
+            }
+          }
+        }
+      },
+      "BalanceResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "balance": {
+                "type": "object",
+                "properties": {
+                  "total": {
+                    "type": "integer",
+                    "description": "Saldo atual em centavos"
+                  },
+                  "pendingPayments": {
+                    "type": "integer",
+                    "description": "Valor total de pagamentos pendentes em centavos"
+                  },
+                  "totalWithPending": {
+                    "type": "integer",
+                    "description": "Saldo total incluindo pagamentos pendentes"
+                  },
+                  "isNegative": {
+                    "type": "boolean",
+                    "description": "Indica se o saldo está negativo"
+                  }
+                }
+              },
+              "disputes": {
+                "type": "object",
+                "properties": {
+                  "total": {
+                    "type": "integer"
+                  },
+                  "pending": {
+                    "type": "integer"
+                  },
+                  "totalDisputedAmount": {
+                    "type": "integer"
+                  },
+                  "totalBlockedAmount": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "statistics": {
+                "type": "object",
+                "properties": {
+                  "totalReceived": {
+                    "type": "integer",
+                    "description": "Total recebido em centavos"
+                  },
+                  "totalFees": {
+                    "type": "integer",
+                    "description": "Total de taxas pagas em centavos"
+                  },
+                  "completedPayments": {
+                    "type": "integer"
+                  },
+                  "pendingPayments": {
+                    "type": "integer"
+                  },
+                  "totalPayments": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "limits": {
+                "type": "object",
+                "properties": {
+                  "daily": {
+                    "type": "integer",
+                    "description": "Limite diário em centavos"
+                  },
+                  "dailyUsed": {
+                    "type": "integer"
+                  },
+                  "dailyRemaining": {
+                    "type": "integer"
+                  },
+                  "monthly": {
+                    "type": "integer",
+                    "description": "Limite mensal em centavos"
+                  },
+                  "monthlyUsed": {
+                    "type": "integer"
+                  },
+                  "monthlyRemaining": {
+                    "type": "integer"
+                  },
+                  "perTransaction": {
+                    "type": "integer",
+                    "description": "Limite por transação em centavos"
+                  }
+                }
+              },
+              "plan": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "transactionFee": {
+                    "type": "integer",
+                    "description": "Taxa por transação em centavos"
+                  },
+                  "transactionFeeInReais": {
+                    "type": "string",
+                    "description": "Taxa por transação em reais"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "hasMore": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PaymentsStatistics": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer"
+          },
+          "completed": {
+            "type": "integer"
+          },
+          "pending": {
+            "type": "integer"
+          },
+          "totalValue": {
+            "type": "integer"
+          },
+          "totalNetValue": {
+            "type": "integer"
+          }
+        }
+      },
+      "WithdrawsStatistics": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer"
+          },
+          "completed": {
+            "type": "integer"
+          },
+          "pending": {
+            "type": "integer"
+          },
+          "failed": {
+            "type": "integer"
+          },
+          "totalValue": {
+            "type": "integer"
+          }
+        }
+      },
+      "PaymentApprovedWebhook": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "const": "payment.approved"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "txid": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "string"
+              },
+              "netAmount": {
+                "type": "string"
+              },
+              "fee": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "originalAmount": {
+                "type": "string"
+              },
+              "feePassedToCustomer": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              },
+              "approvedAt": {
+                "type": "integer"
+              }
+            }
+          },
+          "timestamp": {
+            "type": "integer"
+          }
+        }
+      },
+      "PaymentExpiredWebhook": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "const": "payment.expired"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "txid": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              },
+              "expiredAt": {
+                "type": "integer"
+              }
+            }
+          },
+          "timestamp": {
+            "type": "integer"
+          }
+        }
+      },
+      "PaymentRefundedWebhook": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "const": "payment.refunded"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "txid": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              },
+              "refundedAt": {
+                "type": "integer"
+              }
+            }
+          },
+          "timestamp": {
+            "type": "integer"
+          }
+        }
+      },
+      "WithdrawalCompletedWebhook": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "const": "withdrawal.completed"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "txid": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "string"
+              },
+              "fee": {
+                "type": "string"
+              },
+              "sent": {
+                "type": "string"
+              },
+              "pixKey": {
+                "type": "string"
+              },
+              "pixKeyType": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            }
+          },
+          "timestamp": {
+            "type": "integer"
+          }
+        }
+      },
+      "WithdrawalFailedWebhook": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string",
+            "const": "withdrawal.failed"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "txid": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "failureReason": {
+                "type": "string"
+              },
+              "createdAt": {
+                "type": "integer"
+              }
+            }
+          },
+          "timestamp": {
+            "type": "integer"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": false
+          },
+          "error": {
+            "type": "string",
+            "description": "Mensagem de erro"
+          }
+        }
       }
     }
   }

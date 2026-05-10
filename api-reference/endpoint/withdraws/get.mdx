@@ -1,0 +1,103 @@
+---
+title: 'Buscar Saque'
+description: 'Consulte os detalhes de um saque específico'
+openapi: 'GET /api/v1/withdraw/get/{id}'
+---
+
+Busca um saque específico pelo ID.
+
+<RequestExample>
+```bash cURL
+curl -X GET 'https://api.eyowallet.ru/api/v1/withdraw/get/withdraw_abc123' \
+  -H 'X-API-Key: sua_api_key'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Success
+{
+  "success": true,
+  "data": {
+    "id": "withdraw_abc123",
+    "correlationID": "mistic_transaction_id",
+    "value": 10000,
+    "status": "COMPLETED",
+    "pixKey": "usuario@example.com",
+    "pixKeyType": "EMAIL",
+    "transactionId": "mistic_transaction_id",
+    "fee": 50,
+    "sent": 9950,
+    "completedAt": "2024-01-15T10:30:00Z",
+    "failedAt": null,
+    "failureReason": null,
+    "createdAt": "2024-01-15T10:30:00Z",
+    "updatedAt": "2024-01-15T10:30:00Z"
+  }
+}
+```
+</ResponseExample>
+
+### Parâmetros
+
+<ParamField path="id" type="string" required>
+  ID único do saque.
+</ParamField>
+
+
+### Campos da Resposta
+
+<ResponseField name="id" type="string">
+  ID único do saque.
+</ResponseField>
+
+<ResponseField name="value" type="integer">
+  Valor total do saque em centavos.
+</ResponseField>
+
+<ResponseField name="correlationID" type="string">
+  ID de correlação da transação na gateway.
+</ResponseField>
+
+<ResponseField name="transactionId" type="string">
+  ID da transação na gateway.
+</ResponseField>
+
+<ResponseField name="fee" type="integer">
+  Taxa cobrada pelo saque em centavos.
+</ResponseField>
+
+<ResponseField name="sent" type="integer">
+  Valor líquido enviado em centavos (amount - fee).
+</ResponseField>
+
+<ResponseField name="pixKey" type="string">
+  Chave PIX do destinatário.
+</ResponseField>
+
+<ResponseField name="pixKeyType" type="string">
+  Tipo da chave PIX utilizada.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  Status atual do saque: `PENDING`, `COMPLETED`, ou `FAILED`.
+</ResponseField>
+
+<ResponseField name="completedAt" type="string">
+  Data e hora de conclusão do saque (ISO string). Null se ainda não foi completado.
+</ResponseField>
+
+<ResponseField name="failedAt" type="string">
+  Data e hora de falha do saque (ISO string). Null se não falhou.
+</ResponseField>
+
+<ResponseField name="failureReason" type="string">
+  Motivo da falha do saque. Null se não falhou.
+</ResponseField>
+
+### Permissões Necessárias
+
+Esta rota requer a permissão `read:withdraws`.
+
+### Rate Limiting
+
+- **10 req/s (600 req/min) por API Key**

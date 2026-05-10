@@ -1,72 +1,60 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mintlify Starter Kit",
+  "name": "Eyo Wallet Docs",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#fd2dc6",
+    "light": "#ff6fd9",
+    "dark": "#c91fa0"
   },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentação",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Seja bem vindo(a)",
             "pages": [
               "index",
-              "quickstart",
-              "development"
-            ]
-          },
-          {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/components",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "Agent ready",
-            "pages": [
-              "agent-ready/prompt",
-              "agent-ready/visibility",
-              "agent-ready/contextual",
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
+              "about-us"
             ]
           }
         ]
       },
       {
-        "tab": "API reference",
+        "tab": "Referência da API",
         "groups": [
           {
-            "group": "API documentation",
+            "group": "Introdução",
             "pages": [
-              "api-reference/introduction"
+              "api-reference/overview",
+              "api-reference/rate-limiting"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Pagamentos",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "api-reference/endpoint/payments/create",
+              "api-reference/endpoint/payments/get",
+              "api-reference/endpoint/payments/list"
+            ]
+          },
+          {
+            "group": "Saques",
+            "pages": [
+              "api-reference/endpoint/withdraws/create",
+              "api-reference/endpoint/withdraws/crypto",
+              "api-reference/endpoint/withdraws/get",
+              "api-reference/endpoint/withdraws/list"
+            ]
+          },
+          {
+            "group": "Conta",
+            "pages": [
+              "api-reference/endpoint/transfers/internal",
+              "api-reference/endpoint/user/balance",
+              "api-reference/endpoint/user/webhook"
             ]
           }
         ]
@@ -75,14 +63,14 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
+          "anchor": "Canal Telegram",
+          "href": "https://t.me/eyowallet",
+          "icon": "telegram"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
+          "anchor": "Dashboard",
+          "href": "https://eyowallet.ru",
+          "icon": "link"
         }
       ]
     }
@@ -94,33 +82,31 @@
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "Suporte",
+        "href": "https://t.me/eyowallet"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "href": "https://eyowallet.ru"
     }
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "telegram": "https://t.me/eyowallet"
     }
   }
 }

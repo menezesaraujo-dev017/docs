@@ -1,0 +1,119 @@
+---
+title: 'Transferência Interna'
+description: 'Transfira saldo para outra conta Eyo Wallet usando o email'
+openapi: 'POST /api/v1/transfer/internal'
+---
+
+<RequestExample>
+```bash cURL
+curl -X POST 'https://api.eyowallet.ru/api/v1/transfer/internal' \
+  -H 'X-API-Key: sua_api_key' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "email": "destinatario@example.com",
+    "value": 50.00,
+    "description": "Pagamento de serviço"
+  }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Success
+{
+  "success": true,
+  "message": "Transferência realizada com sucesso",
+  "data": {
+    "id": "transfer_abc123",
+    "value": 5000,
+    "valueInReais": 50.00,
+    "recipientEmail": "destinatario@example.com",
+    "recipientName": "João Silva",
+    "description": "Pagamento de serviço",
+    "createdAt": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+```json Error - Usuário não encontrado
+{
+  "success": false,
+  "error": "Usuário não encontrado"
+}
+```
+
+```json Error - Saldo insuficiente
+{
+  "success": false,
+  "error": "Saldo insuficiente para realizar a transferência"
+}
+```
+</ResponseExample>
+
+### Parâmetros
+
+<ParamField body="email" type="string" required>
+  Email do destinatário da transferência. Deve ser uma conta Eyo Wallet ativa.
+</ParamField>
+
+<ParamField body="value" type="number" required>
+  Valor da transferência em reais. Pode ser qualquer valor acima de R$ 0,01.
+</ParamField>
+
+<ParamField body="description" type="string">
+  Descrição opcional da transferência. Aparecerá no extrato do destinatário.
+</ParamField>
+
+### Campos da Resposta
+
+<ResponseField name="id" type="string">
+  ID único da transferência.
+</ResponseField>
+
+<ResponseField name="value" type="integer">
+  Valor da transferência em centavos.
+</ResponseField>
+
+<ResponseField name="valueInReais" type="number">
+  Valor da transferência em reais.
+</ResponseField>
+
+<ResponseField name="recipientEmail" type="string">
+  Email do destinatário.
+</ResponseField>
+
+<ResponseField name="recipientName" type="string">
+  Nome do destinatário.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  Descrição da transferência.
+</ResponseField>
+
+### Vantagens da Transferência Interna
+
+| Característica | Descrição |
+|----------------|-----------|
+| **Gratuita** | Sem taxa de transferência |
+| **Instantânea** | Saldo disponível imediatamente |
+| **Sem limite** | Sem valor mínimo ou máximo |
+| **Simples** | Apenas email + valor necessários |
+
+<Tip>
+  Transferências internas são a forma mais rápida e econômica de enviar dinheiro para outros usuários Eyo Wallet.
+</Tip>
+
+### Erros Comuns
+
+| Código | Erro | Descrição |
+|--------|------|-----------|
+| 404 | `Usuário não encontrado` | O email informado não pertence a nenhuma conta Eyo Wallet |
+| 400 | `Saldo insuficiente` | Você não tem saldo suficiente para a transferência |
+| 400 | `Não é possível transferir para si mesmo` | O email é o mesmo da sua conta |
+
+### Permissões Necessárias
+
+Esta rota requer a permissão `write:transfer:internal`.
+
+### Rate Limiting
+
+- **10 req/s (600 req/min) por API Key**

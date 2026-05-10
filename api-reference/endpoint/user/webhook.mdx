@@ -1,0 +1,742 @@
+---
+title: 'Webhooks'
+description: 'Configure webhooks para receber notificações em tempo real sobre eventos da API'
+openapi: 'WEBHOOK /webhook'
+---
+
+## Visão Geral
+
+Webhooks permitem que você receba notificações em tempo real sobre eventos importantes na sua conta Eyo Wallet, como pagamentos confirmados, saques processados e mudanças de status.
+
+## Configurar Webhook
+
+Configure o webhook na criação de uma API Key ou atualize o webhook da API Key principal:
+
+<RequestExample>
+```bash cURL
+curl -X PUT 'https://api.eyowallet.ru/api/v1/user/api-key/main' \
+  -H 'X-API-Key: sua_api_key' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "webhookUrl": "https://seusite.com/webhook"
+  }'
+```
+</RequestExample>
+
+## Eventos Enviados
+
+A Eyo Wallet envia webhooks para os seguintes eventos:
+
+### Pagamento Aprovado (`payment.approved`)
+
+Quando um pagamento PIX é confirmado e aprovado:
+
+```json
+{
+  "event": "payment.approved",
+  "data": {
+    "txid": "payment_abc123",
+    "amount": "100.00",
+    "netAmount": "99.50",
+    "fee": "0.50",
+    "status": "approved",
+    "originalAmount": "100.00",
+    "feePassedToCustomer": true,
+    "description": "Pagamento de serviço",
+    "createdAt": 1705312200000,
+    "approvedAt": 1705312500000
+  },
+  "timestamp": 1705312500000
+}
+```
+
+### Pagamento Expirado (`payment.expired`)
+
+Quando um pagamento expira sem ser pago:
+
+```json
+{
+  "event": "payment.expired",
+  "data": {
+    "txid": "payment_abc123",
+    "amount": "100.00",
+    "status": "expired",
+    "description": "Pagamento de serviço",
+    "createdAt": 1705312200000,
+    "expiredAt": 1705315800000
+  },
+  "timestamp": 1705315800000
+}
+```
+
+### Pagamento Reembolsado (`payment.refunded`)
+
+Quando um pagamento é reembolsado:
+
+```json
+{
+  "event": "payment.refunded",
+  "data": {
+    "txid": "payment_abc123",
+    "amount": "100.00",
+    "status": "refunded",
+    "description": "Pagamento de serviço",
+    "createdAt": 1705312200000,
+    "refundedAt": 1705316000000
+  },
+  "timestamp": 1705316000000
+}
+```
+
+### Saque Processado (`withdrawal.completed`)
+
+Quando um saque é processado com sucesso:
+
+```json
+{
+  "event": "withdrawal.completed",
+  "data": {
+    "txid": "withdraw_abc123",
+    "amount": "100.00",
+    "fee": "0.50",
+    "sent": "99.50",
+    "pixKey": "usuario@example.com",
+    "pixKeyType": "EMAIL",
+    "status": "completed",
+    "createdAt": 1705312200000
+  },
+  "timestamp": 1705312205000
+}
+```
+
+### Saque Falhou (`withdrawal.failed`)
+
+Quando um saque falha:
+
+```json
+{
+  "event": "withdrawal.failed",
+  "data": {
+    "txid": "withdraw_abc123",
+    "amount": "100.00",
+    "status": "failed",
+    "failureReason": "Saldo insuficiente",
+    "createdAt": 1705312200000
+  },
+  "timestamp": 1705312210000
+}
+```
+
+## Headers Enviados
+
+A Eyo Wallet envia os seguintes headers em cada requisição de webhook:
+
+| Header | Descrição |
+|--------|-----------|
+| `X-Webhook-Signature` | Assinatura HMAC-SHA256 do payload (formato: `sha256=...`) |
+| `X-Webhook-Timestamp` | Timestamp Unix em segundos da requisição |
+| `Content-Type` | `application/json` |
+| `User-Agent` | `eyo-wallet-API/1.0` |
+
+## Segurança e Verificação de Assinatura
+
+<Warning>
+  **IMPORTANTE**: Sempre verifique a assinatura do webhook antes de processar qualquer evento. Isso protege seu sistema contra requisições forjadas.
+</Warning>
+
+Cada webhook é assinado usando **HMAC-SHA256** com sua **API Key** como secret. Você DEVE verificar a assinatura para garantir que o webhook é autêntico e vem da Eyo Wallet.
+
+### Como Funciona a Assinatura
+
+1. A Eyo Wallet cria uma assinatura HMAC-SHA256 do payload JSON usando sua API Key
+2. A assinatura é enviada no header `X-Webhook-Signature` no formato `sha256=...`
+3. Você deve recriar a assinatura usando o mesmo método e comparar com a recebida
+4. Se as assinaturas corresponderem, o webhook é autêntico
+
+## Processar Webhooks
+
+Seu endpoint de webhook deve:
+
+1. **Verificar a assinatura**: Validar que a requisição vem da Eyo Wallet usando HMAC-SHA256
+2. **Validar o timestamp** (opcional): Prevenir ataques de replay verificando se o timestamp não é muito antigo
+3. **Processar o evento**: Executar a lógica necessária baseada no tipo de evento
+4. **Retornar 200**: Responder com status HTTP 200 para confirmar recebimento
+
+<CodeGroup>
+```javascript Node.js
+const express = require('express');
+const crypto = require('crypto');
+const app = express();
+
+app.use(express.json());
+
+// Sua API Key da Eyo Wallet (armazene em variável de ambiente)
+const VISION_WALLET_API_KEY = process.env.VISION_WALLET_API_KEY;
+
+/**
+ * Verifica a assinatura do webhook
+ * @param {object} payload - O payload JSON recebido
+ * @param {string} signature - A assinatura do header X-Webhook-Signature
+ * @param {string} apiKey - Sua API Key da Eyo Wallet
+ * @returns {boolean} - true se a assinatura é válida
+ */
+function verifyWebhookSignature(payload, signature, apiKey) {
+  if (!signature || !apiKey) {
+    return false;
+  }
+
+  // O payload deve ser serializado exatamente como foi enviado
+  const payloadString = JSON.stringify(payload);
+  
+  // Criar assinatura esperada usando HMAC-SHA256
+  const expectedSignature = crypto
+    .createHmac('sha256', apiKey)
+    .update(payloadString)
+    .digest('hex');
+  
+  // A assinatura vem no formato "sha256=..."
+  const expectedSignatureWithPrefix = `sha256=${expectedSignature}`;
+  
+  // Comparação segura para prevenir timing attacks
+  return crypto.timingSafeEqual(
+    Buffer.from(signature),
+    Buffer.from(expectedSignatureWithPrefix)
+  );
+}
+
+/**
+ * Valida o timestamp para prevenir replay attacks
+ * @param {string} timestamp - Timestamp do header X-Webhook-Timestamp
+ * @param {number} maxAgeSeconds - Idade máxima em segundos (padrão: 5 minutos)
+ * @returns {boolean} - true se o timestamp é válido
+ */
+function validateTimestamp(timestamp, maxAgeSeconds = 300) {
+  if (!timestamp) {
+    return false;
+  }
+
+  const timestampNum = parseInt(timestamp, 10);
+  const now = Math.floor(Date.now() / 1000);
+  const age = now - timestampNum;
+
+  return age >= 0 && age <= maxAgeSeconds;
+}
+
+// Endpoint de webhook
+app.post('/webhook', async (req, res) => {
+  try {
+    const signature = req.headers['x-webhook-signature'];
+    const timestamp = req.headers['x-webhook-timestamp'];
+    const payload = req.body;
+
+    // 1. Verificar assinatura (OBRIGATÓRIO)
+    if (!verifyWebhookSignature(payload, signature, VISION_WALLET_API_KEY)) {
+      console.warn('Webhook com assinatura inválida recebido');
+      return res.status(401).json({ 
+        error: 'Invalid signature',
+        message: 'A assinatura do webhook é inválida'
+      });
+    }
+
+    // 2. Validar timestamp (RECOMENDADO)
+    if (!validateTimestamp(timestamp)) {
+      console.warn('Webhook com timestamp inválido recebido');
+      return res.status(400).json({ 
+        error: 'Invalid timestamp',
+        message: 'O timestamp do webhook é inválido ou muito antigo'
+      });
+    }
+
+    // 3. Processar o evento
+    const { event, data } = payload;
+
+    switch (event) {
+      case 'payment.approved':
+        // Atualizar status do pedido no seu sistema
+        await updateOrderStatus(data.txid, 'paid');
+        console.log(`Pagamento aprovado: ${data.txid} - Valor: R$ ${data.netAmount}`);
+        break;
+        
+      case 'payment.expired':
+        // Notificar usuário sobre pagamento expirado
+        await notifyUser(data.txid, 'payment_expired');
+        console.log(`Pagamento expirado: ${data.txid}`);
+        break;
+        
+      case 'payment.refunded':
+        // Processar reembolso no seu sistema
+        await processRefund(data.txid, data.amount);
+        console.log(`Pagamento reembolsado: ${data.txid}`);
+        break;
+        
+      case 'withdrawal.completed':
+        // Registrar saque processado
+        await logWithdraw(data.txid, data.sent);
+        console.log(`Saque processado: ${data.txid} - Valor enviado: R$ ${data.sent}`);
+        break;
+        
+      case 'withdrawal.failed':
+        // Reverter saldo ou notificar sobre falha
+        await handleWithdrawFailure(data.txid, data.failureReason);
+        console.log(`Saque falhou: ${data.txid} - Motivo: ${data.failureReason || 'Desconhecido'}`);
+        break;
+        
+      default:
+        console.warn(`Evento desconhecido recebido: ${event}`);
+    }
+    
+    // 4. Sempre retornar 200 para confirmar recebimento
+    res.status(200).json({ received: true });
+  } catch (error) {
+    console.error('Erro ao processar webhook:', error);
+    // Ainda retornar 200 para evitar retentativas desnecessárias
+    // Mas logue o erro para investigação
+    res.status(200).json({ received: true, error: error.message });
+  }
+});
+
+// Funções auxiliares (implemente conforme sua lógica de negócio)
+async function updateOrderStatus(txid, status) {
+  // Sua lógica aqui - atualizar pedido como pago
+  // Exemplo: await db.orders.update({ paymentId: txid }, { status: 'paid' });
+}
+
+async function notifyUser(txid, reason) {
+  // Sua lógica aqui - notificar usuário sobre mudança de status
+  // Exemplo: await sendEmail(userId, `Pagamento ${reason}`);
+}
+
+async function processRefund(txid, amount) {
+  // Sua lógica aqui - processar reembolso
+  // Exemplo: await db.refunds.create({ txid, amount, processedAt: new Date() });
+}
+
+async function logWithdraw(txid, amount) {
+  // Sua lógica aqui - registrar saque processado
+  // Exemplo: await db.withdraws.update({ txid }, { status: 'completed', sent: amount });
+}
+
+async function handleWithdrawFailure(txid, reason) {
+  // Sua lógica aqui - reverter saldo ou notificar sobre falha
+  // Exemplo: await db.withdraws.update({ txid }, { status: 'failed', failureReason: reason });
+}
+
+app.listen(3000, () => {
+  console.log('Servidor rodando na porta 3000');
+});
+```
+```python Python
+from flask import Flask, request, jsonify
+import hmac
+import hashlib
+import time
+import os
+
+app = Flask(__name__)
+
+# Sua API Key da Eyo Wallet (armazene em variável de ambiente)
+VISION_WALLET_API_KEY = os.getenv('VISION_WALLET_API_KEY')
+
+def verify_webhook_signature(payload, signature, api_key):
+    """
+    Verifica a assinatura do webhook
+    
+    Args:
+        payload: O payload JSON recebido (dict)
+        signature: A assinatura do header X-Webhook-Signature
+        api_key: Sua API Key da Eyo Wallet
+    
+    Returns:
+        bool: True se a assinatura é válida
+    """
+    if not signature or not api_key:
+        return False
+    
+    # O payload deve ser serializado exatamente como foi enviado
+    import json
+    payload_string = json.dumps(payload, separators=(',', ':'), sort_keys=False)
+    
+    # Criar assinatura esperada usando HMAC-SHA256
+    expected_signature = hmac.new(
+        api_key.encode('utf-8'),
+        payload_string.encode('utf-8'),
+        hashlib.sha256
+    ).hexdigest()
+    
+    # A assinatura vem no formato "sha256=..."
+    expected_signature_with_prefix = f"sha256={expected_signature}"
+    
+    # Comparação segura para prevenir timing attacks
+    return hmac.compare_digest(signature, expected_signature_with_prefix)
+
+def validate_timestamp(timestamp, max_age_seconds=300):
+    """
+    Valida o timestamp para prevenir replay attacks
+    
+    Args:
+        timestamp: Timestamp do header X-Webhook-Timestamp (string)
+        max_age_seconds: Idade máxima em segundos (padrão: 5 minutos)
+    
+    Returns:
+        bool: True se o timestamp é válido
+    """
+    if not timestamp:
+        return False
+    
+    try:
+        timestamp_num = int(timestamp)
+        now = int(time.time())
+        age = now - timestamp_num
+        
+        return age >= 0 and age <= max_age_seconds
+    except (ValueError, TypeError):
+        return False
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    try:
+        signature = request.headers.get('X-Webhook-Signature')
+        timestamp = request.headers.get('X-Webhook-Timestamp')
+        payload = request.json
+        
+        # 1. Verificar assinatura (OBRIGATÓRIO)
+        if not verify_webhook_signature(payload, signature, VISION_WALLET_API_KEY):
+            print('Webhook com assinatura inválida recebido')
+            return jsonify({
+                'error': 'Invalid signature',
+                'message': 'A assinatura do webhook é inválida'
+            }), 401
+        
+        # 2. Validar timestamp (RECOMENDADO)
+        if not validate_timestamp(timestamp):
+            print('Webhook com timestamp inválido recebido')
+            return jsonify({
+                'error': 'Invalid timestamp',
+                'message': 'O timestamp do webhook é inválido ou muito antigo'
+            }), 400
+        
+        # 3. Processar o evento
+        event = payload.get('event')
+        data = payload.get('data')
+        
+        if event == 'payment.approved':
+            # Atualizar status do pedido no seu sistema
+            update_order_status(data['txid'], 'paid')
+            print(f"Pagamento aprovado: {data['txid']} - Valor: R$ {data['netAmount']}")
+        elif event == 'payment.expired':
+            # Notificar usuário sobre pagamento expirado
+            notify_user(data['txid'], 'payment_expired')
+            print(f"Pagamento expirado: {data['txid']}")
+        elif event == 'payment.refunded':
+            # Processar reembolso no seu sistema
+            process_refund(data['txid'], data['amount'])
+            print(f"Pagamento reembolsado: {data['txid']}")
+        elif event == 'withdrawal.completed':
+            # Registrar saque processado
+            log_withdraw(data['txid'], data['sent'])
+            print(f"Saque processado: {data['txid']} - Valor enviado: R$ {data['sent']}")
+        elif event == 'withdrawal.failed':
+            # Reverter saldo ou notificar sobre falha
+            handle_withdraw_failure(data['txid'], data.get('failureReason'))
+            print(f"Saque falhou: {data['txid']} - Motivo: {data.get('failureReason', 'Desconhecido')}")
+        else:
+            print(f"Evento desconhecido recebido: {event}")
+        
+        # 4. Sempre retornar 200 para confirmar recebimento
+        return jsonify({'received': True}), 200
+        
+    except Exception as e:
+        print(f'Erro ao processar webhook: {e}')
+        # Ainda retornar 200 para evitar retentativas desnecessárias
+        return jsonify({'received': True, 'error': str(e)}), 200
+
+# Funções auxiliares (implemente conforme sua lógica de negócio)
+def update_order_status(txid, status):
+    # Sua lógica aqui - atualizar pedido como pago
+    # Exemplo: db.orders.update_one({'paymentId': txid}, {'$set': {'status': 'paid'}})
+    pass
+
+def notify_user(txid, reason):
+    # Sua lógica aqui - notificar usuário sobre mudança de status
+    # Exemplo: send_email(user_id, f'Pagamento {reason}')
+    pass
+
+def process_refund(txid, amount):
+    # Sua lógica aqui - processar reembolso
+    # Exemplo: db.refunds.insert_one({'txid': txid, 'amount': amount, 'processedAt': datetime.now()})
+    pass
+
+def log_withdraw(txid, amount):
+    # Sua lógica aqui - registrar saque processado
+    # Exemplo: db.withdraws.update_one({'txid': txid}, {'$set': {'status': 'completed', 'sent': amount}})
+    pass
+
+def handle_withdraw_failure(txid, reason):
+    # Sua lógica aqui - reverter saldo ou notificar sobre falha
+    # Exemplo: db.withdraws.update_one({'txid': txid}, {'$set': {'status': 'failed', 'failureReason': reason}})
+    pass
+
+if __name__ == '__main__':
+    app.run(port=3000)
+```
+```php PHP
+<?php
+// webhook.php
+
+// Sua API Key da Eyo Wallet (armazene em variável de ambiente)
+$VISION_WALLET_API_KEY = getenv('VISION_WALLET_API_KEY');
+
+/**
+ * Verifica a assinatura do webhook
+ * 
+ * @param array $payload O payload JSON recebido
+ * @param string $signature A assinatura do header X-Webhook-Signature
+ * @param string $apiKey Sua API Key da Eyo Wallet
+ * @return bool True se a assinatura é válida
+ */
+function verifyWebhookSignature($payload, $signature, $apiKey) {
+    if (empty($signature) || empty($apiKey)) {
+        return false;
+    }
+    
+    // O payload deve ser serializado exatamente como foi enviado
+    $payloadString = json_encode($payload, JSON_UNESCAPED_SLASHES);
+    
+    // Criar assinatura esperada usando HMAC-SHA256
+    $expectedSignature = hash_hmac('sha256', $payloadString, $apiKey);
+    
+    // A assinatura vem no formato "sha256=..."
+    $expectedSignatureWithPrefix = "sha256={$expectedSignature}";
+    
+    // Comparação segura para prevenir timing attacks
+    return hash_equals($signature, $expectedSignatureWithPrefix);
+}
+
+/**
+ * Valida o timestamp para prevenir replay attacks
+ * 
+ * @param string $timestamp Timestamp do header X-Webhook-Timestamp
+ * @param int $maxAgeSeconds Idade máxima em segundos (padrão: 5 minutos)
+ * @return bool True se o timestamp é válido
+ */
+function validateTimestamp($timestamp, $maxAgeSeconds = 300) {
+    if (empty($timestamp)) {
+        return false;
+    }
+    
+    $timestampNum = (int)$timestamp;
+    $now = time();
+    $age = $now - $timestampNum;
+    
+    return $age >= 0 && $age <= $maxAgeSeconds;
+}
+
+// Ler o payload
+$rawPayload = file_get_contents('php://input');
+$payload = json_decode($rawPayload, true);
+
+$signature = $_SERVER['HTTP_X_WEBHOOK_SIGNATURE'] ?? null;
+$timestamp = $_SERVER['HTTP_X_WEBHOOK_TIMESTAMP'] ?? null;
+
+// 1. Verificar assinatura (OBRIGATÓRIO)
+if (!verifyWebhookSignature($payload, $signature, $VISION_WALLET_API_KEY)) {
+    http_response_code(401);
+    echo json_encode([
+        'error' => 'Invalid signature',
+        'message' => 'A assinatura do webhook é inválida'
+    ]);
+    exit;
+}
+
+// 2. Validar timestamp (RECOMENDADO)
+if (!validateTimestamp($timestamp)) {
+    http_response_code(400);
+    echo json_encode([
+        'error' => 'Invalid timestamp',
+        'message' => 'O timestamp do webhook é inválido ou muito antigo'
+    ]);
+    exit;
+}
+
+// 3. Processar o evento
+$event = $payload['event'];
+$data = $payload['data'];
+
+switch ($event) {
+    case 'payment.approved':
+        // Atualizar status do pedido no seu sistema
+        updateOrderStatus($data['txid'], 'paid');
+        error_log("Pagamento aprovado: " . $data['txid'] . " - Valor: R$ " . $data['netAmount']);
+        break;
+        
+    case 'payment.expired':
+        // Notificar usuário sobre pagamento expirado
+        notifyUser($data['txid'], 'payment_expired');
+        error_log("Pagamento expirado: " . $data['txid']);
+        break;
+        
+    case 'payment.refunded':
+        // Processar reembolso no seu sistema
+        processRefund($data['txid'], $data['amount']);
+        error_log("Pagamento reembolsado: " . $data['txid']);
+        break;
+        
+    case 'withdrawal.completed':
+        // Registrar saque processado
+        logWithdraw($data['txid'], $data['sent']);
+        error_log("Saque processado: " . $data['txid'] . " - Valor enviado: R$ " . $data['sent']);
+        break;
+        
+    case 'withdrawal.failed':
+        // Reverter saldo ou notificar sobre falha
+        handleWithdrawFailure($data['txid'], $data['failureReason'] ?? 'Desconhecido');
+        error_log("Saque falhou: " . $data['txid'] . " - Motivo: " . ($data['failureReason'] ?? 'Desconhecido'));
+        break;
+        
+    default:
+        error_log("Evento desconhecido recebido: " . $event);
+}
+
+// 4. Sempre retornar 200 para confirmar recebimento
+http_response_code(200);
+echo json_encode(['received' => true]);
+
+// Funções auxiliares (implemente conforme sua lógica de negócio)
+function updateOrderStatus($txid, $status) {
+    // Sua lógica aqui - atualizar pedido como pago
+    // Exemplo: $db->orders->updateOne(['paymentId' => $txid], ['$set' => ['status' => 'paid']]);
+}
+
+function notifyUser($txid, $reason) {
+    // Sua lógica aqui - notificar usuário sobre mudança de status
+    // Exemplo: sendEmail($userId, "Pagamento {$reason}");
+}
+
+function processRefund($txid, $amount) {
+    // Sua lógica aqui - processar reembolso
+    // Exemplo: $db->refunds->insertOne(['txid' => $txid, 'amount' => $amount, 'processedAt' => new DateTime()]);
+}
+
+function logWithdraw($txid, $amount) {
+    // Sua lógica aqui - registrar saque processado
+    // Exemplo: $db->withdraws->updateOne(['txid' => $txid], ['$set' => ['status' => 'completed', 'sent' => $amount]]);
+}
+
+function handleWithdrawFailure($txid, $reason) {
+    // Sua lógica aqui - reverter saldo ou notificar sobre falha
+    // Exemplo: $db->withdraws->updateOne(['txid' => $txid], ['$set' => ['status' => 'failed', 'failureReason' => $reason]]);
+}
+?>
+```
+</CodeGroup>
+
+## Boas Práticas de Segurança
+
+<Warning>
+  **NUNCA processe webhooks sem verificar a assinatura!** Qualquer pessoa que descobrir sua URL de webhook pode enviar requisições falsas. A única proteção é a verificação da assinatura HMAC-SHA256.
+</Warning>
+
+<Tip>
+  **Verificação de Assinatura**: Sempre verifique a assinatura usando sua API Key antes de processar qualquer evento. Isso garante que o webhook realmente vem da Eyo Wallet.
+</Tip>
+
+<Tip>
+  **Validação de Timestamp**: Valide o timestamp para prevenir replay attacks. Rejeite webhooks com timestamp muito antigo (recomendado: máximo 5 minutos).
+</Tip>
+
+<Tip>
+  **Comparação Segura**: Use funções de comparação segura (timing-safe) para comparar assinaturas e prevenir timing attacks:
+  - Node.js: `crypto.timingSafeEqual()`
+  - Python: `hmac.compare_digest()`
+  - PHP: `hash_equals()`
+</Tip>
+
+<Tip>
+  **Armazenamento Seguro**: Nunca exponha sua API Key no código. Use variáveis de ambiente ou serviços de gerenciamento de secrets.
+</Tip>
+
+## Boas Práticas de Implementação
+
+<Tip>
+  **Idempotência**: Seu webhook deve ser idempotente. O mesmo evento pode ser enviado múltiplas vezes em caso de retentativas. Use IDs únicos para evitar processamento duplicado.
+</Tip>
+
+<Tip>
+  **Processamento Assíncrono**: Processe eventos de forma assíncrona para responder rapidamente ao servidor. Retorne 200 imediatamente e processe o evento em background.
+</Tip>
+
+<Tip>
+  **Logging**: Registre todos os eventos recebidos (incluindo tentativas de webhooks inválidos) para auditoria e debugging. Isso ajuda a identificar tentativas de ataque.
+</Tip>
+
+<Tip>
+  **Timeout**: Configure timeout adequado no seu servidor. A Eyo Wallet espera resposta em até 10 segundos antes de considerar como falha.
+</Tip>
+
+<Tip>
+  **Tratamento de Erros**: Sempre retorne status HTTP 200 mesmo em caso de erro interno. Isso evita retentativas desnecessárias. Logue os erros internamente para investigação.
+</Tip>
+
+<Warning>
+  Se seu webhook não responder com 200 dentro de 10 segundos, a Eyo Wallet tentará reenviar o evento usando backoff exponencial (até 5 tentativas). Certifique-se de que seu endpoint está sempre disponível e responde rapidamente.
+</Warning>
+
+## Testar Webhooks Localmente
+
+Para testar webhooks localmente durante desenvolvimento, você pode usar ferramentas como:
+
+- **ngrok**: Expõe seu servidor local para a internet (`ngrok http 3000`)
+- **localtunnel**: Alternativa ao ngrok (`lt --port 3000`)
+- **webhook.site**: Serviço temporário para receber webhooks (útil para ver a estrutura)
+
+### Testando a Verificação de Assinatura
+
+Para testar se sua verificação de assinatura está funcionando corretamente, você pode criar um script de teste:
+
+```javascript
+// test-webhook-signature.js
+const crypto = require('crypto');
+
+const apiKey = 'sua_api_key_aqui';
+const payload = {
+  event: 'payment.completed',
+  data: { id: 'test_123' },
+  timestamp: Date.now()
+};
+
+const payloadString = JSON.stringify(payload);
+const signature = crypto
+  .createHmac('sha256', apiKey)
+  .update(payloadString)
+  .digest('hex');
+
+console.log('Payload:', payloadString);
+console.log('Signature:', `sha256=${signature}`);
+console.log('\nUse estes valores para testar seu endpoint:');
+console.log('Header X-Webhook-Signature:', `sha256=${signature}`);
+console.log('Header X-Webhook-Timestamp:', Math.floor(Date.now() / 1000));
+```
+
+## Troubleshooting
+
+### Webhook retorna 401 (Invalid signature)
+
+- Verifique se está usando a API Key correta (a mesma usada para configurar o webhook)
+- Certifique-se de que o payload está sendo serializado exatamente como recebido (sem alterar ordem de chaves ou espaços)
+- Verifique se está comparando a assinatura completa incluindo o prefixo `sha256=`
+
+### Webhook retorna 400 (Invalid timestamp)
+
+- Verifique se o relógio do servidor está sincronizado
+- Ajuste o `maxAgeSeconds` se necessário (padrão recomendado: 300 segundos = 5 minutos)
+
+### Webhook não está sendo recebido
+
+- Verifique se a URL está acessível publicamente (não localhost)
+- Verifique logs do servidor para erros
+- Confirme que o endpoint retorna status 200
+- Verifique se há firewall bloqueando requisições da Eyo Wallet
+
+<Note>
+  Consulte a seção [API Keys](/api-reference/api-keys) para mais informações sobre como configurar webhooks nas suas API Keys.
+</Note>

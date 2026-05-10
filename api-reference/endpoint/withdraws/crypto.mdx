@@ -1,0 +1,100 @@
+---
+title: 'Criar Saque Crypto'
+openapi: 'POST /api/v1/withdraw/crypto'
+---
+
+Cria um novo saque em criptomoeda (USDT na rede BEP20). O valor será debitado do saldo disponível e convertido para USDT.
+
+## Informações Importantes
+
+<Info>
+**Taxa:** `6% do valor + R$ 2,00 fixo por saque`  
+**Valor mínimo:** `R$ 20,00`  
+**Valor máximo:** `R$ 3.000,00`  
+**Rede:** `BEP20 (Binance Smart Chain)`  
+**Moeda:** `USDT (Tether)`
+</Info>
+
+<Warning>
+A wallet deve ser um endereço válido na rede BEP20, no formato `0x` seguido de 40 caracteres hexadecimais.
+</Warning>
+
+<RequestExample>
+
+```bash cURL
+curl -X POST 'https://api.eyowallet.ru/api/v1/withdraw/crypto' \
+  -H 'X-API-Key: sua_api_key' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "amount": 100.00,
+    "wallet": "0x1234567890123456789012345678901234567890",
+    "description": "Saque para minha wallet"
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "message": "Saque crypto adicionado à fila de processamento",
+  "data": {
+    "id": "withdraw_abc123",
+    "type": "CRYPTO_BEP20",
+    "currency": "USDT",
+    "network": "BEP20",
+    "value": 10000,
+    "valueInReais": 100,
+    "fee": 800,
+    "feeInReais": 8,
+    "wallet": "0x1234567890123456789012345678901234567890",
+    "status": "QUEUED",
+    "createdAt": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+</ResponseExample>
+
+### Parâmetros
+
+<ParamField body="amount" type="number" required>
+  Valor do saque em reais. Valor mínimo: R\$ 20,00. Valor máximo: R\$ 3.000,00.
+</ParamField>
+
+<ParamField body="wallet" type="string" required>
+  Endereço da wallet BEP20 do destinatário. Formato: `0x` seguido de 40 caracteres hexadecimais.
+</ParamField>
+
+<ParamField body="description" type="string">
+  Descrição opcional do saque.
+</ParamField>
+
+<Warning>
+  O saldo do usuário será debitado imediatamente ao criar o saque. Certifique-se de que há saldo suficiente (valor + taxa) antes de criar um saque.
+</Warning>
+
+### Cálculo da Taxa
+
+A taxa é calculada da seguinte forma:
+
+```
+Taxa = (Valor × 6%) + R$ 2,00
+```
+
+**Exemplo:** Para um saque de R$ 100,00:
+- Taxa percentual: `R$ 100 × 6% = R$ 6,00`
+- Taxa fixa: `R$ 2,00`
+- **Taxa total:** `R$ 8,00`
+- **Total debitado:** `R$ 108,00`
+
+### Status do Saque
+
+| Status | Descrição |
+|--------|-----------|
+| `QUEUED` | Saque adicionado à fila de processamento |
+| `PROCESSING` | Saque sendo processado |
+| `COMPLETED` | Saque concluído com sucesso |
+| `FAILED` | Saque falhou (saldo é devolvido automaticamente) |

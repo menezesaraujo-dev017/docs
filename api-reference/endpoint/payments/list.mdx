@@ -1,0 +1,89 @@
+---
+title: 'Listar Pagamentos'
+description: 'Liste todas as transações PIX do usuário com filtros e paginação'
+openapi: 'GET /api/v1/payment/list'
+---
+
+<RequestExample>
+```bash cURL
+curl -X GET 'https://api.eyowallet.ru/api/v1/payment/list?limit=50&offset=0&status=COMPLETED' \
+  -H 'X-API-Key: sua_api_key'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Success
+{
+  "success": true,
+  "data": {
+    "payments": [
+      {
+        "id": "payment_abc123",
+        "correlationID": "mistic_transaction_id",
+        "value": 10000,
+        "netValue": 9950,
+        "fee": 50,
+        "status": "COMPLETED",
+        "description": "Pagamento de serviço",
+        "createdAt": "2024-01-15T10:30:00Z",
+        "updatedAt": "2024-01-15T10:35:00Z"
+      }
+    ],
+    "pagination": {
+      "total": 1,
+      "limit": 50,
+      "offset": 0,
+      "hasMore": false
+    },
+    "statistics": {
+      "total": 1,
+      "completed": 1,
+      "pending": 0,
+      "totalValue": 10000,
+      "totalNetValue": 9950
+    }
+  }
+}
+```
+</ResponseExample>
+
+### Parâmetros
+
+
+<ParamField query="status" type="string">
+  Filtrar por status: `PENDING`, `ACTIVE`, `COMPLETED`, `FAILED`.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  Número máximo de resultados a retornar (máximo 100).
+</ParamField>
+
+<ParamField query="offset" type="integer" default="0">
+  Número de resultados a pular (para paginação).
+</ParamField>
+
+### Campos da Resposta
+
+<ResponseField name="payments" type="array">
+  Lista de transações de pagamento.
+</ResponseField>
+
+<ResponseField name="pagination" type="object">
+  Informações de paginação incluindo total de registros e se há mais páginas.
+</ResponseField>
+
+<ResponseField name="statistics" type="object">
+  Estatísticas resumidas dos pagamentos, incluindo totais por status e valores.
+</ResponseField>
+
+### Permissões Necessárias
+
+Esta rota requer a permissão `read:payments`.
+
+### Rate Limiting
+
+- **10 req/s (600 req/min) por API Key**
+
+<Note>
+  Esta rota possui cache de 60 segundos para melhorar a performance.
+</Note>

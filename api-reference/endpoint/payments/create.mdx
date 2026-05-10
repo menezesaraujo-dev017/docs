@@ -1,0 +1,114 @@
+---
+title: "Criar Pagamento"
+description: "Crie uma nova transação PIX e receba um QR Code para pagamento"
+openapi: "POST /api/v1/payment/create"
+---
+
+<RequestExample>
+
+```bash cURL
+curl -X POST 'https://api.eyowallet.ru/api/v1/payment/create' \
+  -H 'X-API-Key: sua_api_key' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "value": 100.00,
+    "description": "Pagamento de serviço",
+    "coverFee": false
+  }'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "message": "Transação criada com sucesso. Aguarde o deposito via PIX.",
+  "data": {
+    "id": "payment_abc123",
+    "transactionId": "mistic_transaction_id",
+    "value": 10000,
+    "valueInReais": 100.00,
+    "netValue": 9950,
+    "fee": 50,
+    "status": "PENDING",
+    "qrcodeUrl": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+    "copyPaste": "00020126580014br.gov.bcb.pix...",
+    "createdAt": "2024-01-15T10:30:00Z"
+  }
+}
+```
+
+</ResponseExample>
+
+### Parâmetros
+
+<ParamField body="value" type="number" required>
+  Valor da transação em reais. Valor mínimo: `R$ 3,00`. Valor máximo: `R$ 5.000,00` por transação.
+</ParamField>
+
+<ParamField body="description" type="string">
+  Descrição opcional da transação. Se não fornecida, será usado um padrão baseado no nome do usuário.
+</ParamField>
+
+<ParamField body="coverFee" default="false" type="boolean">
+  Se `true`, o valor informado é o valor líquido que você deseja receber. A taxa será adicionada ao valor total do pagamento. Se `false` (padrão), o valor informado é o valor total, e a taxa será deduzida.
+</ParamField>
+
+<ParamField body="splitUser" type="string">
+  Email de outro usuário Eyo Wallet para dividir o pagamento. Quando o pagamento for confirmado, o valor será dividido automaticamente entre você e o usuário especificado.
+</ParamField>
+
+<ParamField body="splitTax" default="50" type="number">
+  Porcentagem do valor a ser transferida para o usuário de split. Valor entre 1 e 100. Padrão: 50% (divisão igualitária).
+</ParamField>
+
+### Campos da Resposta
+
+<ResponseField name="qrcodeUrl" type="string">
+  QR Code em formato base64 (data URI). Pode ser usado diretamente em tags `<img>` HTML ou convertido para exibição. Formato: `data:image/png;base64,...`
+</ResponseField>
+
+<ResponseField name="copyPaste" type="string">
+  Código PIX para copiar e colar. Pode ser usado para pagamento manual ou para gerar QR Code localmente.
+</ResponseField>
+
+<ResponseField name="transactionId" type="string">
+  ID da transação na gateway. Usado para rastreamento interno.
+</ResponseField>
+
+<ResponseField name="valueInReais" type="number">
+  Valor total da transação em reais (apenas na resposta de criação).
+</ResponseField>
+
+<ResponseField name="value" type="integer">
+  Valor total da transação em centavos.
+</ResponseField>
+
+<ResponseField name="netValue" type="integer">
+  Valor líquido que será recebido após dedução da taxa, em centavos.
+</ResponseField>
+
+### Status da Transação
+
+As transações podem ter os seguintes status:
+
+| Status      | Descrição                           |
+| ----------- | ----------------------------------- |
+| `PENDING`   | Aguardando pagamento                |
+| `ACTIVE`    | QR Code ativo, aguardando pagamento |
+| `COMPLETED` | Pagamento confirmado                |
+| `FAILED`    | Pagamento falhou ou foi cancelado   |
+
+<Note>
+  Configure webhooks para receber notificações em tempo real quando o status do pagamento mudar.
+</Note>
+
+### Permissões Necessárias
+
+Esta rota requer a permissão `write:payment:create`.
+
+### Rate Limiting
+
+- **10 req/s (600 req/min) por API Key**

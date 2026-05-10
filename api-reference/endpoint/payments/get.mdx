@@ -1,0 +1,64 @@
+---
+title: "Buscar Pagamento"
+description: "Consulte os detalhes de uma transação PIX específica"
+openapi: "GET /api/v1/payment/get/{id}"
+---
+
+<RequestExample>
+
+```bash cURL
+curl -X GET 'https://api.eyowallet.ru/api/v1/payment/get/payment_abc123' \
+  -H 'X-API-Key: sua_api_key'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json Success
+{
+  "success": true,
+  "statusUpdated": false,
+  "data": {
+    "id": "payment_abc123",
+    "transactionId": "mistic_transaction_id",
+    "value": 10000,
+    "netValue": 9950,
+    "status": "COMPLETED",
+    "qrCode": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
+    "description": "Pagamento de serviço",
+    "createdAt": "2024-01-15T10:30:00Z",
+    "updatedAt": "2024-01-15T10:35:00Z"
+  }
+}
+```
+
+</ResponseExample>
+
+### Parâmetros
+
+<ParamField path="id" type="string" required>
+  ID único da transação de pagamento.
+</ParamField>
+
+<Note>
+  Este endpoint sincroniza automaticamente o status com o provedor de pagamento. Se o status mudar durante a consulta, o campo `statusUpdated` será `true`.
+</Note>
+
+### Campos da Resposta
+
+<ResponseField name="qrCode" type="string">
+  QR Code em formato base64 (data URI). Pode ser `null` se o QR Code não estiver disponível. Formato: `data:image/png;base64,...`
+</ResponseField>
+
+<ResponseField name="transactionId" type="string">
+  ID da transação na gateway.
+</ResponseField>
+
+### Permissões Necessárias
+
+Esta rota requer a permissão `read:payments`.
+
+### Rate Limiting
+
+- **10 req/s (600 req/min) por API Key**

@@ -1,0 +1,104 @@
+---
+title: 'Consultar Saldo'
+description: 'Obtenha informações detalhadas sobre saldo, estatísticas e limites'
+openapi: 'GET /api/v1/user/balance'
+---
+
+Obtenha informações detalhadas sobre saldo, estatísticas e limites.
+
+<RequestExample>
+```bash cURL
+curl -X GET 'https://api.eyowallet.ru/api/v1/user/balance' \
+  -H 'X-API-Key: sua_api_key'
+```
+</RequestExample>
+
+<ResponseExample>
+```json Success
+{
+  "success": true,
+  "data": {
+    "balance": {
+      "total": 50000,
+      "pendingPayments": 10000,
+      "totalWithPending": 60000,
+      "isNegative": false
+    },
+    "disputes": {
+      "total": 0,
+      "pending": 0,
+      "totalDisputedAmount": 0,
+      "totalBlockedAmount": 0
+    },
+    "statistics": {
+      "totalReceived": 200000,
+      "totalFees": 1000,
+      "completedPayments": 20,
+      "pendingPayments": 2,
+      "totalPayments": 22
+    },
+    "limits": {
+      "daily": 1000000,
+      "dailyUsed": 50000,
+      "dailyRemaining": 950000,
+      "monthly": 10000000,
+      "monthlyUsed": 200000,
+      "monthlyRemaining": 9800000,
+      "perTransaction": 100000
+    },
+    "plan": {
+      "name": "PRO",
+      "transactionFee": 50,
+      "transactionFeeInReais": "0.50"
+    }
+  }
+}
+```
+</ResponseExample>
+
+### Parâmetros
+
+
+### Campos da Resposta
+
+<ResponseField name="balance" type="object">
+  Informações sobre o saldo da conta.
+  
+  <Expandable title="Propriedades do saldo">
+    <ResponseField name="total" type="integer">
+      Saldo atual em centavos (ex: 50000 = R$ 500,00).
+    </ResponseField>
+    
+    <ResponseField name="pendingPayments" type="integer">
+      Valor total de pagamentos pendentes em centavos.
+    </ResponseField>
+    
+    <ResponseField name="totalWithPending" type="integer">
+      Saldo total incluindo pagamentos pendentes.
+    </ResponseField>
+    
+    <ResponseField name="isNegative" type="boolean">
+      Indica se o saldo está negativo.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="statistics" type="object">
+  Estatísticas de transações do usuário.
+</ResponseField>
+
+<ResponseField name="limits" type="object">
+  Limites de transação configurados para o usuário.
+</ResponseField>
+
+### Permissões Necessárias
+
+Esta rota requer a permissão `read:balance`.
+
+### Rate Limiting
+
+- **10 req/s (600 req/min) por API Key**
+
+<Note>
+  Esta rota possui cache variável para melhorar a performance.
+</Note>
