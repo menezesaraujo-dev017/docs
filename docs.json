@@ -12,29 +12,35 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentação",
+        "tab": "Início",
         "groups": [
           {
-            "group": "Seja bem vindo(a)",
+            "group": "Comece Aqui",
             "pages": [
               "index",
               "about-us"
+            ]
+          },
+          {
+            "group": "Guias e Tutoriais",
+            "pages": [
+              "tutorials/api-key"
             ]
           }
         ]
       },
       {
-        "tab": "Referência da API",
+        "tab": "Desenvolvedores",
         "groups": [
           {
-            "group": "Introdução",
+            "group": "Fundamentos",
             "pages": [
               "api-reference/overview",
               "api-reference/rate-limiting"
             ]
           },
           {
-            "group": "Pagamentos",
+            "group": "Pagamentos PIX",
             "pages": [
               "api-reference/endpoint/payments/create",
               "api-reference/endpoint/payments/get",
@@ -42,20 +48,33 @@
             ]
           },
           {
-            "group": "Saques",
+            "group": "Saques e Transferências",
             "pages": [
               "api-reference/endpoint/withdraws/create",
               "api-reference/endpoint/withdraws/crypto",
               "api-reference/endpoint/withdraws/get",
-              "api-reference/endpoint/withdraws/list"
+              "api-reference/endpoint/withdraws/list",
+              "api-reference/endpoint/transfers/internal"
             ]
           },
           {
-            "group": "Conta",
+            "group": "Gestão de Conta",
             "pages": [
-              "api-reference/endpoint/transfers/internal",
               "api-reference/endpoint/user/balance",
               "api-reference/endpoint/user/webhook"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Ferramentas AI",
+        "groups": [
+          {
+            "group": "Extensões",
+            "pages": [
+              "ai-tools/cursor",
+              "ai-tools/windsurf",
+              "ai-tools/claude-code"
             ]
           }
         ]
@@ -64,14 +83,14 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Canal Telegram",
-          "href": "https://t.me/syncpay",
-          "icon": "telegram"
-        },
-        {
           "anchor": "Dashboard",
           "href": "https://syncpay.com.br",
-          "icon": "link"
+          "icon": "rocket"
+        },
+        {
+          "anchor": "Status",
+          "href": "https://syncpay.com.br/status",
+          "icon": "signal"
         }
       ]
     }
@@ -81,15 +100,10 @@
     "dark": "/logo/dark.svg"
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Suporte",
-        "href": "https://t.me/syncpay"
-      }
-    ],
+    "links": [],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
+      "label": "Acessar Dashboard",
       "href": "https://syncpay.com.br"
     }
   },
@@ -106,8 +120,6 @@
     ]
   },
   "footer": {
-    "socials": {
-      "telegram": "https://t.me/syncpay"
-    }
+    "socials": {}
   }
 }
