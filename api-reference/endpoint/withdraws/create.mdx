@@ -7,7 +7,7 @@ openapi: "POST /api/v1/withdraw/create"
 <RequestExample>
 
 ```bash cURL
-curl -X POST 'https://api.eyowallet.ru/api/v1/withdraw/create' \
+curl -X POST 'https://api.syncpay.com.br/api/v1/withdraw/create' \
   -H 'X-API-Key: sua_api_key' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -63,7 +63,7 @@ curl -X POST 'https://api.eyowallet.ru/api/v1/withdraw/create' \
 </ParamField>
 
 <ParamField body="splitUser" type="string">
-  Email de outro usuário Eyo Wallet para dividir o saque. O valor do split será enviado via PIX para o usuário especificado.
+  Email de outro usuário Sync Pay para dividir o saque. O valor do split será enviado via PIX para o usuário especificado.
 </ParamField>
 
 <ParamField body="splitTax" default="50" type="number">

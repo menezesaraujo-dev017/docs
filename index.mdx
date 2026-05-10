@@ -1,124 +1,141 @@
 ---
 title: "Introdução"
-description: "Documentação oficial da Eyo Wallet"
-icon: book
+description: "Documentação oficial da Sync Pay - A Revolução nos Pagamentos Digitais"
+icon: "rocket"
 ---
 
-Somos a plataforma de pagamentos digitais que oferece **anonimato** e **privacidade**, **sem KYC**, **sem MEDs** e acessibilidade para **qualquer idade**. Aqui você encontrará tudo o que precisa para integrar pagamentos PIX, gerenciar sua carteira digital e automatizar seu negócio.
+<img
+  className="block dark:hidden"
+  src="/images/hero-light.png"
+  alt="Hero Light"
+/>
+<img
+  className="hidden dark:block"
+  src="/images/hero-dark.png"
+  alt="Hero Dark"
+/>
+
+## A Nova Era dos Pagamentos
+
+A **Sync Pay** é a plataforma definitiva para quem busca **anonimato**, **segurança** e **agilidade**. Desenvolvida para o mercado moderno, oferecemos uma infraestrutura robusta de pagamentos PIX sem as burocracias tradicionais.
 
 <CardGroup cols={2}>
   <Card
-    title="Sobre Nós"
-    icon="info"
+    title="Sobre a Sync Pay"
+    icon="shield-check"
     href="/about-us"
+    color="#FF5C00"
   >
-    Conheça a Eyo Wallet, nossa missão e diferenciais exclusivos.
+    Descubra como garantimos sua privacidade e segurança em cada transação.
   </Card>
   <Card
-    title="Referência da API"
-    icon="dev"
+    title="Guia de Integração"
+    icon="code"
     href="/api-reference/overview"
+    color="#FF5C00"
   >
-    Comece a integrar nossa API em seus sistemas.
+    Documentação técnica completa para desenvolvedores e empresas.
   </Card>
 </CardGroup>
 
 ---
 
-## Por que Eyo Wallet?
+## Por que escolher a Sync Pay?
+
+Nossa tecnologia foi construída sobre quatro pilares fundamentais que nos diferenciam de qualquer outra carteira digital.
 
 <CardGroup cols={2}>
-  <Card title="Privacidade Total" icon="user-secret">
-    Transações anônimas sem exposição de dados pessoais.
+  <Card title="Privacidade Absoluta" icon="user-secret" color="#FF5C00">
+    Transações 100% anônimas. Seus dados pessoais nunca são expostos ou compartilhados.
   </Card>
-  <Card title="Sem KYC" icon="id-card-clip">
-    Cadastro simplificado, comece a usar imediatamente.
+  <Card title="Zero Burocracia (Sem KYC)" icon="bolt" color="#FF5C00">
+    Esqueça o envio de documentos. Crie sua conta e comece a operar em segundos.
   </Card>
-  <Card title="Sem MEDs" icon="ban">
-    Livre de chargebacks e estornos indevidos.
+  <Card title="Proteção Anti-MED" icon="lock" color="#FF5C00">
+    Sistema blindado contra chargebacks e estornos indevidos, garantindo seu faturamento.
   </Card>
-  <Card title="Para Todos" icon="users">
-    Acessível para qualquer idade, incluindo menores de 18.
+  <Card title="Liberdade de Idade" icon="unlocked" color="#FF5C00">
+    Sem restrições. Acessível para todos, independentemente da idade ou localização.
   </Card>
 </CardGroup>
 
 <Tip>
-  Quer saber mais sobre nossos diferenciais? Acesse a página [Sobre Nós](/about-us) para conhecer todos os benefícios da Eyo Wallet.
+  **Dica Pro:** Automatize seu fluxo de caixa usando nossos Webhooks e receba notificações em tempo real de cada pagamento.
 </Tip>
 
 ---
 
-## Começando
+## Comece Agora
 
-Escolha por onde deseja começar sua jornada com a Eyo Wallet.
+Siga os passos abaixo para ativar sua operação com a Sync Pay.
 
 <Steps>
-  <Step title="Crie sua conta">
-    Acesse [eyowallet.ru](https://eyowallet.ru) e crie sua conta gratuitamente.
+  <Step title="Cadastro Instantâneo">
+    Acesse [syncpay.com.br](https://syncpay.com.br) e registre-se apenas com seu e-mail.
   </Step>
-  <Step title="Obtenha sua API Key">
-    Acesse a [Dashboard](https://eyowallet.ru/dashboard/credentials) para configurar suas credenciais.
+  <Step title="Configuração de API">
+    Gere sua chave de acesso na [Dashboard de Credenciais](https://syncpay.com.br/dashboard/credentials).
   </Step>
-  <Step title="Integre e automatize">
-    Use nossa [API](/api-reference/overview) para automatizar seus ganhos.
+  <Step title="Deploy e Escala">
+    Integre nossos endpoints e veja seu negócio escalar com a melhor taxa do mercado.
   </Step>
 </Steps>
 
 ---
 
+## Explore a API
 
-## Referência da API
-
-Documentação completa de todos os endpoints disponíveis.
+Navegue pelos nossos módulos e encontre a solução ideal para sua necessidade.
 
 <CardGroup cols={2}>
   <Card
-    title="Visão Geral"
-    icon="eye"
-    href="/api-reference/overview"
-  >
-    Entenda como funciona a API e como autenticar suas requisições.
-  </Card>
-  <Card
-    title="Pagamentos"
-    icon="credit-card"
+    title="Checkout PIX"
+    icon="qrcode"
     href="/api-reference/endpoint/payments/create"
   >
-    Crie e gerencie transações PIX.
+    Geração dinâmica de QR Codes e chaves copia e cola.
   </Card>
   <Card
-    title="Saques"
-    icon="money-bill-transfer"
+    title="Gestão de Saques"
+    icon="wallet"
     href="/api-reference/endpoint/withdraws/create"
   >
-    Solicite saques para sua conta bancária.
+    Envie valores para qualquer conta via PIX de forma instantânea.
   </Card>
   <Card
-    title="Transferências"
-    icon="arrow-right-arrow-left"
+    title="Transferências Internas"
+    icon="paper-plane"
     href="/api-reference/endpoint/transfers/internal"
   >
-    Transfira saldo entre usuários Eyo Wallet.
+    Movimente saldo entre contas Sync Pay com taxa zero.
+  </Card>
+  <Card
+    title="Webhooks"
+    icon="webhook"
+    href="/api-reference/endpoint/user/webhook"
+  >
+    Sincronize seu sistema com nossos eventos de pagamento.
   </Card>
 </CardGroup>
 
 ---
 
-## Precisa de ajuda?
+## Suporte e Comunidade
 
 <CardGroup cols={2}>
   <Card
-    title="Suporte no Telegram"
+    title="Canal Oficial"
     icon="telegram"
-    href="https://t.me/eyowallet"
+    href="https://t.me/syncpay"
+    color="#24A1DE"
   >
-    Junte-se à nosso canal para obter ajuda e tirar dúvidas.
+    Fique por dentro das atualizações e novidades em nosso Telegram.
   </Card>
   <Card
-    title="Sobre Nós"
-    icon="info"
-    href="/about-us"
+    title="Status da API"
+    icon="signal"
+    href="https://syncpay.com.br/status"
   >
-    Conheça mais sobre a Eyo Wallet e nosso ecossistema.
+    Acompanhe a disponibilidade de nossos serviços em tempo real.
   </Card>
 </CardGroup>

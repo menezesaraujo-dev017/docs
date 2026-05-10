@@ -1,51 +1,89 @@
 ---
-title: "Visão Geral"
-description: "Visão geral da API Eyo Wallet e como começar"
-icon: "eye"
+title: "Visão Geral da API"
+description: "Guia completo para integração com o ecossistema Sync Pay"
+icon: "code"
 ---
 
-A API Eyo Wallet permite que você integre pagamentos PIX, saques e gerenciamento de carteira digital em suas aplicações.
+A API da **Sync Pay** foi projetada para ser simples, rápida e segura. Baseada em padrões REST, ela permite que desenvolvedores integrem fluxos complexos de pagamentos e recebimentos com poucas linhas de código.
 
-## Base URL
+## Endpoints de Produção
 
-Todas as requisições devem ser feitas para:
+Todas as requisições devem ser direcionadas para o nosso servidor de produção:
 
-```
-https://api.eyowallet.ru
-```
+<Card title="Base URL" icon="link">
+  `https://api.syncpay.com.br`
+</Card>
 
-## Autenticação
+<Warning>
+  Sempre utilize HTTPS para garantir que os dados trafegados entre sua aplicação e nossos servidores estejam criptografados.
+</Warning>
 
-A API utiliza autenticação baseada em API Keys. Inclua sua API Key no header da requisição:
+## Autenticação Segura
 
-```
+Para interagir com nossa API, você precisa de uma **API Key**. Esta chave é pessoal e intransferível.
+
+### Como autenticar:
+
+Adicione sua chave ao header de cada requisição utilizando um dos métodos abaixo:
+
+**Método Recomendado (Header Customizado):**
+```http
 X-API-Key: sua_api_key_aqui
 ```
 
-Ou usando o header Authorization:
-
-```
+**Método Padrão (Bearer Token):**
+```http
 Authorization: Bearer sua_api_key_aqui
 ```
 
-## Estrutura de Resposta
+---
 
-Todas as respostas seguem um formato padrão:
+## Padrões de Resposta
 
-- **Sucesso**: `{ "success": true, "data": {...} }`
-- **Erro**: `{ "success": false, "error": "...", "message": "..." }`
+Nossa API utiliza o formato JSON para todas as respostas. Cada resposta contém um booleano `success` para facilitar o tratamento de erros no seu código.
 
-## Rate Limiting
+### Exemplo de Sucesso (200 OK)
+```json
+{
+  "success": true,
+  "data": {
+    "id": "pay_123456",
+    "status": "PENDING",
+    "amount": 150.00
+  }
+}
+```
 
-A API implementa rate limiting para garantir estabilidade e segurança. Consulte a seção [Rate Limiting](/api-reference/rate-limiting) para detalhes completos.
+### Exemplo de Erro (400 Bad Request)
+```json
+{
+  "success": false,
+  "error": "INVALID_AMOUNT",
+  "message": "O valor do pagamento deve ser maior que R$ 1,00"
+}
+```
 
-## Próximos Passos
+---
+
+## Ambientes e Testes
+
+Atualmente, todas as integrações ocorrem diretamente em nosso ambiente principal. Recomendamos realizar testes com valores mínimos (R$ 1,00) para validar seu fluxo de integração antes de entrar em escala.
 
 <CardGroup cols={2}>
-  <Card title="Rate Limiting" icon="clock" href="/api-reference/rate-limiting">
-    Saiba como funciona o rate limiting
+  <Card title="Rate Limiting" icon="gauge-high" href="/api-reference/rate-limiting">
+    Entenda os limites de requisições para manter sua aplicação estável.
   </Card>
-  <Card title="Pagamentos" icon="credit-card" href="/api-reference/endpoint/payments/create">
-    Comece a criar transações PIX
+  <Card title="Webhooks" icon="bell" href="/api-reference/endpoint/user/webhook">
+    Aprenda a configurar notificações automáticas para seu servidor.
   </Card>
 </CardGroup>
+
+---
+
+## Suporte ao Desenvolvedor
+
+Se encontrar qualquer dificuldade durante a integração, nossa equipe técnica está disponível para ajudar através do nosso canal oficial.
+
+<Button href="https://t.me/syncpay" icon="telegram" variant="filled">
+  Falar com Suporte Técnico
+</Button>

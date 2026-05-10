@@ -1,17 +1,17 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Eyo Wallet API",
-    "description": "API para integração com a Eyo Wallet - Plataforma de pagamentos PIX para desenvolvedores e empresas",
+    "title": "Sync Pay API",
+    "description": "API para integração com a Sync Pay - Plataforma de pagamentos PIX para desenvolvedores e empresas",
     "version": "1.0.0",
     "contact": {
-      "name": "Eyo Wallet",
-      "url": "https://eyowallet.ru"
+      "name": "Sync Pay",
+      "url": "https://syncpay.com.br"
     }
   },
   "servers": [
     {
-      "url": "https://api.eyowallet.ru",
+      "url": "https://api.syncpay.com.br",
       "description": "Servidor de Produção"
     }
   ],
@@ -31,7 +31,7 @@
     },
     {
       "name": "Transfers",
-      "description": "Endpoints para transferências internas entre contas Eyo Wallet"
+      "description": "Endpoints para transferências internas entre contas Sync Pay"
     },
     {
       "name": "User",
@@ -388,7 +388,7 @@
       "post": {
         "operationId": "internalTransfer",
         "summary": "Transferência Interna",
-        "description": "Transfere saldo para outra conta Eyo Wallet usando o email. Transferências internas são gratuitas e instantâneas.",
+        "description": "Transfere saldo para outra conta Sync Pay usando o email. Transferências internas são gratuitas e instantâneas.",
         "tags": [
           "Transfers"
         ],
@@ -567,7 +567,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "X-API-Key",
-        "description": "API Key obtida no painel da Eyo Wallet"
+        "description": "API Key obtida no painel da Sync Pay"
       }
     },
     "schemas": {
@@ -594,7 +594,7 @@
           },
           "splitUser": {
             "type": "string",
-            "description": "Email de outro usuário Eyo Wallet para dividir o pagamento"
+            "description": "Email de outro usuário Sync Pay para dividir o pagamento"
           },
           "splitTax": {
             "type": "number",
@@ -827,7 +827,7 @@
           },
           "splitUser": {
             "type": "string",
-            "description": "Email de outro usuário Eyo Wallet para dividir o saque"
+            "description": "Email de outro usuário Sync Pay para dividir o saque"
           },
           "splitTax": {
             "type": "number",
@@ -1128,7 +1128,7 @@
           "email": {
             "type": "string",
             "format": "email",
-            "description": "Email do destinatário (conta Eyo Wallet ativa)"
+            "description": "Email do destinatário (conta Sync Pay ativa)"
           },
           "value": {
             "type": "number",

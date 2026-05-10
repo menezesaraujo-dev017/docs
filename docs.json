@@ -1,11 +1,11 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Eyo Wallet Docs",
+  "name": "Sync Pay Docs",
   "colors": {
-    "primary": "#fd2dc6",
-    "light": "#ff6fd9",
-    "dark": "#c91fa0"
+    "primary": "#FF5C00",
+    "light": "#FF8540",
+    "dark": "#CC4A00"
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -64,12 +64,12 @@
       "anchors": [
         {
           "anchor": "Canal Telegram",
-          "href": "https://t.me/eyowallet",
+          "href": "https://t.me/syncpay",
           "icon": "telegram"
         },
         {
           "anchor": "Dashboard",
-          "href": "https://eyowallet.ru",
+          "href": "https://syncpay.com.br",
           "icon": "link"
         }
       ]
@@ -83,13 +83,13 @@
     "links": [
       {
         "label": "Suporte",
-        "href": "https://t.me/eyowallet"
+        "href": "https://t.me/syncpay"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Dashboard",
-      "href": "https://eyowallet.ru"
+      "href": "https://syncpay.com.br"
     }
   },
   "contextual": {
@@ -106,7 +106,7 @@
   },
   "footer": {
     "socials": {
-      "telegram": "https://t.me/eyowallet"
+      "telegram": "https://t.me/syncpay"
     }
   }
 }

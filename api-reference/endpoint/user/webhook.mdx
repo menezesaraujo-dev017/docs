@@ -6,7 +6,7 @@ openapi: 'WEBHOOK /webhook'
 
 ## Visão Geral
 
-Webhooks permitem que você receba notificações em tempo real sobre eventos importantes na sua conta Eyo Wallet, como pagamentos confirmados, saques processados e mudanças de status.
+Webhooks permitem que você receba notificações em tempo real sobre eventos importantes na sua conta Sync Pay, como pagamentos confirmados, saques processados e mudanças de status.
 
 ## Configurar Webhook
 
@@ -14,7 +14,7 @@ Configure o webhook na criação de uma API Key ou atualize o webhook da API Key
 
 <RequestExample>
 ```bash cURL
-curl -X PUT 'https://api.eyowallet.ru/api/v1/user/api-key/main' \
+curl -X PUT 'https://api.syncpay.com.br/api/v1/user/api-key/main' \
   -H 'X-API-Key: sua_api_key' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -25,7 +25,7 @@ curl -X PUT 'https://api.eyowallet.ru/api/v1/user/api-key/main' \
 
 ## Eventos Enviados
 
-A Eyo Wallet envia webhooks para os seguintes eventos:
+A Sync Pay envia webhooks para os seguintes eventos:
 
 ### Pagamento Aprovado (`payment.approved`)
 
@@ -129,7 +129,7 @@ Quando um saque falha:
 
 ## Headers Enviados
 
-A Eyo Wallet envia os seguintes headers em cada requisição de webhook:
+A Sync Pay envia os seguintes headers em cada requisição de webhook:
 
 | Header | Descrição |
 |--------|-----------|
@@ -144,11 +144,11 @@ A Eyo Wallet envia os seguintes headers em cada requisição de webhook:
   **IMPORTANTE**: Sempre verifique a assinatura do webhook antes de processar qualquer evento. Isso protege seu sistema contra requisições forjadas.
 </Warning>
 
-Cada webhook é assinado usando **HMAC-SHA256** com sua **API Key** como secret. Você DEVE verificar a assinatura para garantir que o webhook é autêntico e vem da Eyo Wallet.
+Cada webhook é assinado usando **HMAC-SHA256** com sua **API Key** como secret. Você DEVE verificar a assinatura para garantir que o webhook é autêntico e vem da Sync Pay.
 
 ### Como Funciona a Assinatura
 
-1. A Eyo Wallet cria uma assinatura HMAC-SHA256 do payload JSON usando sua API Key
+1. A Sync Pay cria uma assinatura HMAC-SHA256 do payload JSON usando sua API Key
 2. A assinatura é enviada no header `X-Webhook-Signature` no formato `sha256=...`
 3. Você deve recriar a assinatura usando o mesmo método e comparar com a recebida
 4. Se as assinaturas corresponderem, o webhook é autêntico
@@ -157,7 +157,7 @@ Cada webhook é assinado usando **HMAC-SHA256** com sua **API Key** como secret.
 
 Seu endpoint de webhook deve:
 
-1. **Verificar a assinatura**: Validar que a requisição vem da Eyo Wallet usando HMAC-SHA256
+1. **Verificar a assinatura**: Validar que a requisição vem da Sync Pay usando HMAC-SHA256
 2. **Validar o timestamp** (opcional): Prevenir ataques de replay verificando se o timestamp não é muito antigo
 3. **Processar o evento**: Executar a lógica necessária baseada no tipo de evento
 4. **Retornar 200**: Responder com status HTTP 200 para confirmar recebimento
@@ -170,14 +170,14 @@ const app = express();
 
 app.use(express.json());
 
-// Sua API Key da Eyo Wallet (armazene em variável de ambiente)
+// Sua API Key da Sync Pay (armazene em variável de ambiente)
 const VISION_WALLET_API_KEY = process.env.VISION_WALLET_API_KEY;
 
 /**
  * Verifica a assinatura do webhook
  * @param {object} payload - O payload JSON recebido
  * @param {string} signature - A assinatura do header X-Webhook-Signature
- * @param {string} apiKey - Sua API Key da Eyo Wallet
+ * @param {string} apiKey - Sua API Key da Sync Pay
  * @returns {boolean} - true se a assinatura é válida
  */
 function verifyWebhookSignature(payload, signature, apiKey) {
@@ -334,7 +334,7 @@ import os
 
 app = Flask(__name__)
 
-# Sua API Key da Eyo Wallet (armazene em variável de ambiente)
+# Sua API Key da Sync Pay (armazene em variável de ambiente)
 VISION_WALLET_API_KEY = os.getenv('VISION_WALLET_API_KEY')
 
 def verify_webhook_signature(payload, signature, api_key):
@@ -344,7 +344,7 @@ def verify_webhook_signature(payload, signature, api_key):
     Args:
         payload: O payload JSON recebido (dict)
         signature: A assinatura do header X-Webhook-Signature
-        api_key: Sua API Key da Eyo Wallet
+        api_key: Sua API Key da Sync Pay
     
     Returns:
         bool: True se a assinatura é válida
@@ -483,7 +483,7 @@ if __name__ == '__main__':
 <?php
 // webhook.php
 
-// Sua API Key da Eyo Wallet (armazene em variável de ambiente)
+// Sua API Key da Sync Pay (armazene em variável de ambiente)
 $VISION_WALLET_API_KEY = getenv('VISION_WALLET_API_KEY');
 
 /**
@@ -491,7 +491,7 @@ $VISION_WALLET_API_KEY = getenv('VISION_WALLET_API_KEY');
  * 
  * @param array $payload O payload JSON recebido
  * @param string $signature A assinatura do header X-Webhook-Signature
- * @param string $apiKey Sua API Key da Eyo Wallet
+ * @param string $apiKey Sua API Key da Sync Pay
  * @return bool True se a assinatura é válida
  */
 function verifyWebhookSignature($payload, $signature, $apiKey) {
@@ -637,7 +637,7 @@ function handleWithdrawFailure($txid, $reason) {
 </Warning>
 
 <Tip>
-  **Verificação de Assinatura**: Sempre verifique a assinatura usando sua API Key antes de processar qualquer evento. Isso garante que o webhook realmente vem da Eyo Wallet.
+  **Verificação de Assinatura**: Sempre verifique a assinatura usando sua API Key antes de processar qualquer evento. Isso garante que o webhook realmente vem da Sync Pay.
 </Tip>
 
 <Tip>
@@ -670,7 +670,7 @@ function handleWithdrawFailure($txid, $reason) {
 </Tip>
 
 <Tip>
-  **Timeout**: Configure timeout adequado no seu servidor. A Eyo Wallet espera resposta em até 10 segundos antes de considerar como falha.
+  **Timeout**: Configure timeout adequado no seu servidor. A Sync Pay espera resposta em até 10 segundos antes de considerar como falha.
 </Tip>
 
 <Tip>
@@ -678,7 +678,7 @@ function handleWithdrawFailure($txid, $reason) {
 </Tip>
 
 <Warning>
-  Se seu webhook não responder com 200 dentro de 10 segundos, a Eyo Wallet tentará reenviar o evento usando backoff exponencial (até 5 tentativas). Certifique-se de que seu endpoint está sempre disponível e responde rapidamente.
+  Se seu webhook não responder com 200 dentro de 10 segundos, a Sync Pay tentará reenviar o evento usando backoff exponencial (até 5 tentativas). Certifique-se de que seu endpoint está sempre disponível e responde rapidamente.
 </Warning>
 
 ## Testar Webhooks Localmente
@@ -735,7 +735,7 @@ console.log('Header X-Webhook-Timestamp:', Math.floor(Date.now() / 1000));
 - Verifique se a URL está acessível publicamente (não localhost)
 - Verifique logs do servidor para erros
 - Confirme que o endpoint retorna status 200
-- Verifique se há firewall bloqueando requisições da Eyo Wallet
+- Verifique se há firewall bloqueando requisições da Sync Pay
 
 <Note>
   Consulte a seção [API Keys](/api-reference/api-keys) para mais informações sobre como configurar webhooks nas suas API Keys.

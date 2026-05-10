@@ -1,12 +1,12 @@
 ---
 title: 'Transferência Interna'
-description: 'Transfira saldo para outra conta Eyo Wallet usando o email'
+description: 'Transfira saldo para outra conta Sync Pay usando o email'
 openapi: 'POST /api/v1/transfer/internal'
 ---
 
 <RequestExample>
 ```bash cURL
-curl -X POST 'https://api.eyowallet.ru/api/v1/transfer/internal' \
+curl -X POST 'https://api.syncpay.com.br/api/v1/transfer/internal' \
   -H 'X-API-Key: sua_api_key' \
   -H 'Content-Type: application/json' \
   -d '{
@@ -52,7 +52,7 @@ curl -X POST 'https://api.eyowallet.ru/api/v1/transfer/internal' \
 ### Parâmetros
 
 <ParamField body="email" type="string" required>
-  Email do destinatário da transferência. Deve ser uma conta Eyo Wallet ativa.
+  Email do destinatário da transferência. Deve ser uma conta Sync Pay ativa.
 </ParamField>
 
 <ParamField body="value" type="number" required>
@@ -99,14 +99,14 @@ curl -X POST 'https://api.eyowallet.ru/api/v1/transfer/internal' \
 | **Simples** | Apenas email + valor necessários |
 
 <Tip>
-  Transferências internas são a forma mais rápida e econômica de enviar dinheiro para outros usuários Eyo Wallet.
+  Transferências internas são a forma mais rápida e econômica de enviar dinheiro para outros usuários Sync Pay.
 </Tip>
 
 ### Erros Comuns
 
 | Código | Erro | Descrição |
 |--------|------|-----------|
-| 404 | `Usuário não encontrado` | O email informado não pertence a nenhuma conta Eyo Wallet |
+| 404 | `Usuário não encontrado` | O email informado não pertence a nenhuma conta Sync Pay |
 | 400 | `Saldo insuficiente` | Você não tem saldo suficiente para a transferência |
 | 400 | `Não é possível transferir para si mesmo` | O email é o mesmo da sua conta |
 

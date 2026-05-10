@@ -1,12 +1,12 @@
 ---
 title: 'Rate Limiting'
-description: 'Entenda como funciona o rate limiting na API Eyo Wallet'
+description: 'Entenda como funciona o rate limiting na API Sync Pay'
 icon: 'gauge'
 ---
 
 ## Visão Geral
 
-A API Eyo Wallet implementa rate limiting para garantir estabilidade, segurança e uso justo dos recursos. Diferentes tipos de rotas têm limites diferentes baseados no método de autenticação.
+A API Sync Pay implementa rate limiting para garantir estabilidade, segurança e uso justo dos recursos. Diferentes tipos de rotas têm limites diferentes baseados no método de autenticação.
 
 ## Limites por Tipo de Rota
 
@@ -257,11 +257,11 @@ def make_request(url):
 ```bash
 # Primeiras 25 requisições em 1 segundo - OK
 for i in {1..25}; do
-  curl -H "X-API-Key: sua_key" https://api.eyowallet.ru/api/v1/user/balance
+  curl -H "X-API-Key: sua_key" https://api.syncpay.com.br/api/v1/user/balance
 done
 
 # Após 1500 requisições em 1 minuto - 429 Too Many Requests
-curl -H "X-API-Key: sua_key" https://api.eyowallet.ru/api/v1/user/balance
+curl -H "X-API-Key: sua_key" https://api.syncpay.com.br/api/v1/user/balance
 # Resposta: {"error": "Too Many Requests", "retryAfter": 60}
 ```
 
