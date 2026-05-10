@@ -15,49 +15,71 @@ icon: "rocket"
   alt="Hero Dark"
 />
 
-## A Nova Era dos Pagamentos
+<div className="custom-container">
+  <div className="flex flex-col gap-2">
+    <h1 className="text-4xl font-bold max-w-2xl">
+      A Nova Era dos <span className="text-primary">Pagamentos</span>
+    </h1>
+    <p className="text-foreground/70 text-sm max-w-2xl">
+      A **Sync Pay** é a plataforma definitiva para quem busca **anonimato**, **segurança** e **agilidade**. Desenvolvida para o mercado moderno, oferecemos uma infraestrutura robusta de pagamentos PIX sem as burocracias tradicionais.
+    </p>
+    
+    <div className="custom-divider" />
+    
+    <div className="flex flex-col">
+      <p className="text-primary text-[12px]">Com a Sync você tem</p>
+      <p className="text-primary text-3xl font-bold">
+        Privacidade Total
+        <span className="text-foreground/60 text-[12px] font-[300]"> / Sem KYC</span>
+      </p>
+      <p className="text-foreground/70 text-sm max-w-2xl">
+        Sem custos extras, sem complicações. Apenas resultados reais e práticos para o seu negócio.
+      </p>
+    </div>
 
-A **Sync Pay** é a plataforma definitiva para quem busca **anonimato**, **segurança** e **agilidade**. Desenvolvida para o mercado moderno, oferecemos uma infraestrutura robusta de pagamentos PIX sem as burocracias tradicionais.
+    <div className="flex flex-col md:flex-row gap-2">
+      <div className="badge-custom">
+        Experimente grátis
+      </div>
+      <div className="badge-custom">
+        Taxas competitivas
+      </div>
+    </div>
 
-<CardGroup cols={2}>
-  <Card
-    title="Sobre a Sync Pay"
-    icon="shield-check"
-    href="/about-us"
-    color="#FF5C00"
-  >
-    Descubra como garantimos sua privacidade e segurança em cada transação.
-  </Card>
-  <Card
-    title="Guia de Integração"
-    icon="code"
-    href="/api-reference/overview"
-    color="#FF5C00"
-  >
-    Documentação técnica completa para desenvolvedores e empresas.
-  </Card>
-</CardGroup>
+    <div className="custom-divider" />
 
----
-
-## Por que escolher a Sync Pay?
-
-Nossa tecnologia foi construída sobre quatro pilares fundamentais que nos diferenciam de qualquer outra carteira digital.
-
-<CardGroup cols={2}>
-  <Card title="Privacidade Absoluta" icon="user-secret" color="#FF5C00">
-    Transações 100% anônimas. Seus dados pessoais nunca são expostos ou compartilhados.
-  </Card>
-  <Card title="Zero Burocracia (Sem KYC)" icon="bolt" color="#FF5C00">
-    Esqueça o envio de documentos. Crie sua conta e comece a operar em segundos.
-  </Card>
-  <Card title="Proteção Anti-MED" icon="lock" color="#FF5C00">
-    Sistema blindado contra chargebacks e estornos indevidos, garantindo seu faturamento.
-  </Card>
-  <Card title="Liberdade de Idade" icon="unlocked" color="#FF5C00">
-    Sem restrições. Acessível para todos, independentemente da idade ou localização.
-  </Card>
-</CardGroup>
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-4">
+      <div className="flex flex-col gap-1">
+        <div className="flex gap-2 items-center">
+          <Icon icon="user-secret" size={16} />
+          <span className="text-[0.875rem] font-bold">Privacidade Absoluta</span>
+        </div>
+        <p className="text-foreground/70 font-[370] text-[13px] leading-relaxed">Transações 100% anônimas. Seus dados pessoais nunca são expostos.</p>
+      </div>
+      <div className="flex flex-col gap-1">
+        <div className="flex gap-2 items-center">
+          <Icon icon="bolt" size={16} />
+          <span className="text-[0.875rem] font-bold">Zero Burocracia</span>
+        </div>
+        <p className="text-foreground/70 font-[370] text-[13px] leading-relaxed">Esqueça o envio de documentos. Comece a operar em segundos.</p>
+      </div>
+      <div className="flex flex-col gap-1">
+        <div className="flex gap-2 items-center">
+          <Icon icon="lock" size={16} />
+          <span className="text-[0.875rem] font-bold">Proteção Anti-MED</span>
+        </div>
+        <p className="text-foreground/70 font-[370] text-[13px] leading-relaxed">Sistema blindado contra chargebacks e estornos indevidos.</p>
+      </div>
+      <div className="flex flex-col gap-1">
+        <div className="flex gap-2 items-center">
+          <Icon icon="unlocked" size={16} />
+          <span className="text-[0.875rem] font-bold">Liberdade Total</span>
+        </div>
+        <p className="text-foreground/70 font-[370] text-[13px] leading-relaxed">Sem restrições de idade ou localização para o seu negócio.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <Tip>
   **Dica Pro:** Automatize seu fluxo de caixa usando nossos Webhooks e receba notificações em tempo real de cada pagamento.

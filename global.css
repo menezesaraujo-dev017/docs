@@ -1,0 +1,36 @@
+/* Estilos globais para a documentação Sync Pay */
+
+.custom-container {
+  background-color: rgba(var(--foreground-rgb), 0.01);
+  border: 1px solid rgba(var(--foreground-rgb), 0.1);
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  margin-top: 2.5rem;
+  margin-bottom: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .custom-container {
+    padding: 2.5rem;
+  }
+}
+
+.custom-divider {
+  border-top: 1px solid rgba(var(--foreground-rgb), 0.1);
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.text-primary-custom {
+  color: #FF5C00;
+}
+
+.badge-custom {
+  background-color: rgba(255, 92, 0, 0.1);
+  border: 1px solid rgba(255, 92, 0, 0.2);
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.875rem;
+  color: #FF5C00;
+  width: fit-content;
+}
