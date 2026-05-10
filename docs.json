@@ -75,7 +75,13 @@
           {
             "group": "Inteligência Artificial",
             "pages": [
-              "ai-tools/hub"
+              "ai-tools/hub",
+              {
+                "group": "— Em Breve —",
+                "pages": [
+                  "sync-events"
+                ]
+              }
             ]
           }
         ]
@@ -85,12 +91,12 @@
       "anchors": [
         {
           "anchor": "Dashboard",
-          "href": "https://syncpay.com.br",
+          "href": "https://syncpay.com.br/dashboard",
           "icon": "rocket"
         },
         {
           "anchor": "Status",
-          "href": "https://syncpay.com.br/status",
+          "href": "https://status.syncpay.com.br",
           "icon": "signal"
         }
       ]
