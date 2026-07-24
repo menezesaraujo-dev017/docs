@@ -1,0 +1,91 @@
+---
+title: "Changelog"
+description: "Histórico de atualizações e melhorias da Sto Pay API"
+icon: "clock-rotate-left"
+---
+
+Acompanhe todas as evoluções da **Sto Pay API**. Recomendamos assinar nosso canal de atualizações para ser notificado sobre novas versões.
+
+---
+
+## v1.3.0 — Junho 2025
+
+<Badge variant="success">Novo</Badge>
+
+### ✨ Novidades
+
+- **Saque Crypto** — Novo endpoint `POST /api/v1/withdraw/crypto` para saques em criptomoedas (USDT, BTC)
+- **Idempotency Keys** — Suporte a cabeçalho `Idempotency-Key` para evitar transações duplicadas
+- **Webhook Signature** — Verificação de assinatura HMAC-SHA256 nos payloads de webhook
+
+### 🔧 Melhorias
+
+- Performance do endpoint `GET /api/v1/payment/list` melhorada em 40%
+- Mensagens de erro mais descritivas nos campos de validação
+- Headers de rate limit agora incluído em **todas** as respostas
+
+### 🐛 Correções
+
+- Corrigido bug onde pagamentos expirados retornavam status `PENDING` em vez de `EXPIRED`
+- Corrigido timeout esporádico no endpoint de saldo
+
+---
+
+## v1.2.0 — Abril 2025
+
+<Badge variant="default">Atualização</Badge>
+
+### ✨ Novidades
+
+- **Transferência Interna** — Endpoint `POST /api/v1/transfer/internal` para envio entre contas Sto Pay
+- **Filtros Avançados** — Suporte a filtros de `date_from`, `date_to` e `status` nos endpoints de listagem
+- **Paginação** — Novos campos `page`, `limit` e `total` nas respostas de listagem
+
+### 🔧 Melhorias
+
+- Tempo de geração de QR Code reduzido de 800ms para 120ms
+- SDK Node.js atualizado para v2.0 com suporte a TypeScript nativo
+- Documentação dos endpoints de saque expandida com mais exemplos
+
+### 🐛 Correções
+
+- Corrigido encode incorreto de caracteres especiais nas descrições PIX
+- Resolvido race condition na criação simultânea de saques
+
+---
+
+## v1.1.0 — Fevereiro 2025
+
+<Badge variant="default">Atualização</Badge>
+
+### ✨ Novidades
+
+- **Webhooks** — Sistema de notificações em tempo real via `POST /api/v1/user/webhook`
+- **Consulta de Saldo** — Endpoint `GET /api/v1/user/balance` com informações detalhadas de saldo e limites
+- **API Key Scopes** — Suporte a permissões granulares por chave de API
+
+### 🔧 Melhorias
+
+- Rate limit aumentado de 10 para 25 requisições por segundo
+- Suporte a múltiplas API Keys por conta
+- Resposta de erro padronizada com campo `error` sempre presente
+
+---
+
+## v1.0.0 — Janeiro 2025
+
+<Badge variant="outline">Lançamento</Badge>
+
+### 🚀 Lançamento Inicial
+
+- **Pagamentos PIX** — Criação, consulta e listagem de pagamentos
+- **Saques PIX** — Criação, consulta e listagem de saques
+- **Autenticação por API Key** — Header `X-API-Key` e `Authorization: Bearer`
+- **Rate Limiting** — 1500 requisições por minuto por API Key
+- **Formato JSON** — Todas as respostas padronizadas com `success`, `data` e `error`
+
+---
+
+<Note>
+  Para acompanhar atualizações em tempo real, siga nosso canal no [Telegram](https://t.me/stopay).
+</Note>

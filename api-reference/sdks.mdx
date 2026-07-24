@@ -1,0 +1,193 @@
+---
+title: "SDKs Oficiais"
+description: "Bibliotecas oficiais da Sto Pay para Node.js, Python e PHP"
+icon: "box"
+---
+
+Acelere sua integração com os SDKs oficiais da **Sto Pay**. Disponíveis para as principais linguagens do mercado.
+
+## Instalação
+
+<CodeGroup>
+
+```bash Node.js
+npm install @stopay/sdk
+# ou
+yarn add @stopay/sdk
+```
+
+```bash Python
+pip install stopay-sdk
+```
+
+```bash PHP
+composer require stopay/sdk
+```
+
+</CodeGroup>
+
+---
+
+## Node.js / TypeScript
+
+### Inicialização
+
+```typescript
+import { StoPay } from '@stopay/sdk';
+
+const client = new StoPay({
+  apiKey: process.env.STOPAY_API_KEY,
+  // environment: 'production' // padrão
+});
+```
+
+### Criar Pagamento
+
+```typescript
+const payment = await client.payments.create({
+  amount: 150.00,
+  description: 'Pedido #1234',
+  expiresIn: 3600, // segundos
+});
+
+console.log(payment.data.qrCode); // QR Code base64
+console.log(payment.data.pixKey); // Chave PIX copia-e-cola
+```
+
+### Consultar Pagamento
+
+```typescript
+const payment = await client.payments.get('pay_abc123');
+
+if (payment.data.status === 'PAID') {
+  console.log('Pagamento confirmado!');
+}
+```
+
+### Listar Pagamentos
+
+```typescript
+const payments = await client.payments.list({
+  page: 1,
+  limit: 20,
+  status: 'PAID',
+});
+
+payments.data.items.forEach(p => {
+  console.log(`${p.id}: R$ ${p.amount}`);
+});
+```
+
+---
+
+## Python
+
+### Inicialização
+
+```python
+from stopay import StoPay
+
+client = StoPay(api_key=os.environ['STOPAY_API_KEY'])
+```
+
+### Criar Pagamento
+
+```python
+payment = client.payments.create(
+    amount=150.00,
+    description='Pedido #1234',
+    expires_in=3600
+)
+
+print(payment['data']['qr_code'])  # QR Code base64
+print(payment['data']['pix_key'])  # Chave PIX
+```
+
+### Consultar Pagamento
+
+```python
+payment = client.payments.get('pay_abc123')
+
+if payment['data']['status'] == 'PAID':
+    print('Pagamento confirmado!')
+```
+
+---
+
+## PHP
+
+### Inicialização
+
+```php
+use StoPay\Client;
+
+$client = new Client([
+    'api_key' => $_ENV['STOPAY_API_KEY'],
+]);
+```
+
+### Criar Pagamento
+
+```php
+$payment = $client->payments->create([
+    'amount' => 150.00,
+    'description' => 'Pedido #1234',
+    'expires_in' => 3600,
+]);
+
+echo $payment['data']['qr_code'];
+echo $payment['data']['pix_key'];
+```
+
+---
+
+## Tratamento de Erros
+
+Todos os SDKs lançam exceções tipadas para facilitar o tratamento:
+
+<CodeGroup>
+
+```typescript Node.js
+import { StoPayError, RateLimitError, AuthError } from '@stopay/sdk';
+
+try {
+  const payment = await client.payments.create({ amount: 0 });
+} catch (err) {
+  if (err instanceof RateLimitError) {
+    console.log(`Tente novamente em ${err.retryAfter}s`);
+  } else if (err instanceof AuthError) {
+    console.log('API Key inválida');
+  } else if (err instanceof StoPayError) {
+    console.log(`Erro: ${err.message}`);
+  }
+}
+```
+
+```python Python
+from stopay.exceptions import RateLimitError, AuthError, StoPayError
+
+try:
+    payment = client.payments.create(amount=0)
+except RateLimitError as e:
+    print(f'Tente novamente em {e.retry_after}s')
+except AuthError:
+    print('API Key inválida')
+except StoPayError as e:
+    print(f'Erro: {e.message}')
+```
+
+</CodeGroup>
+
+<Note>
+  Os SDKs realizam automaticamente **retry com backoff exponencial** em erros `429 Too Many Requests`.
+</Note>
+
+<CardGroup cols={2}>
+  <Card title="Rate Limiting" icon="gauge" href="/api-reference/rate-limiting">
+    Entenda os limites de requisições da API
+  </Card>
+
+  <Card title="Webhooks" icon="bell" href="/api-reference/endpoint/user/webhook">
+    Configure notificações em tempo real
+  </Card>
+</CardGroup>
