@@ -1,12 +1,12 @@
 ---
-title: 'Rate Limiting'
-description: 'Entenda como funciona o rate limiting na API Sync Pay'
-icon: 'gauge'
+title: "Rate Limiting"
+description: "Entenda como funciona o rate limiting na API Sto Pay"
+icon: "gauge"
 ---
 
 ## Visão Geral
 
-A API Sync Pay implementa rate limiting para garantir estabilidade, segurança e uso justo dos recursos. Diferentes tipos de rotas têm limites diferentes baseados no método de autenticação.
+A API Sto Pay implementa rate limiting para garantir estabilidade, segurança e uso justo dos recursos. Diferentes tipos de rotas têm limites diferentes baseados no método de autenticação.
 
 ## Limites por Tipo de Rota
 
@@ -15,7 +15,7 @@ A API Sync Pay implementa rate limiting para garantir estabilidade, segurança e
 Rotas que requerem autenticação via API Key têm os seguintes limites:
 
 | Métrica | Valor |
-|---------|-------|
+| --- | --- |
 | Limite | 25 requisições por segundo |
 | Equivalente | 1500 requisições por minuto |
 | Janela | 1 minuto |
@@ -29,7 +29,7 @@ Rotas que requerem autenticação via API Key têm os seguintes limites:
 
 Todas as respostas incluem headers informativos sobre o rate limit:
 
-```
+```text
 X-RateLimit-Limit: 1500
 X-RateLimit-Remaining: 1497
 X-RateLimit-Reset: 1698765432
@@ -54,6 +54,7 @@ X-RateLimit-Reset: 1698765432
 Quando o rate limit é excedido, você receberá uma resposta HTTP 429:
 
 <ResponseExample>
+
 ```json 429 Too Many Requests
 {
   "success": false,
@@ -62,6 +63,7 @@ Quando o rate limit é excedido, você receberá uma resposta HTTP 429:
   "retryAfter": 5
 }
 ```
+
 </ResponseExample>
 
 ### Campos da Resposta
@@ -85,6 +87,7 @@ Quando o rate limit é excedido, você receberá uma resposta HTTP 429:
 Quando receber um erro 429, implemente backoff exponencial antes de tentar novamente:
 
 <CodeGroup>
+
 ```javascript Node.js
 async function makeRequestWithRetry(url, options, maxRetries = 3) {
   for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -107,6 +110,7 @@ async function makeRequestWithRetry(url, options, maxRetries = 3) {
   }
 }
 ```
+
 ```python Python
 import time
 import requests
@@ -129,6 +133,7 @@ def make_request_with_retry(url, headers, max_retries=3):
                 raise
             time.sleep(2 ** attempt)
 ```
+
 </CodeGroup>
 
 ### 2. Monitorar Headers de Rate Limit
@@ -136,6 +141,7 @@ def make_request_with_retry(url, headers, max_retries=3):
 Monitore os headers `X-RateLimit-Remaining` para evitar atingir o limite:
 
 <CodeGroup>
+
 ```javascript Node.js
 async function makeRequest(url, apiKey) {
   const response = await fetch(url, {
@@ -156,6 +162,7 @@ async function makeRequest(url, apiKey) {
   return response;
 }
 ```
+
 ```python Python
 import time
 import requests
@@ -173,6 +180,7 @@ def make_request(url, api_key):
     
     return response
 ```
+
 </CodeGroup>
 
 ### 3. Usar Cache Quando Possível
@@ -188,6 +196,7 @@ Algumas rotas têm cache implementado. Use essas rotas para reduzir o número de
 Em vez de fazer múltiplas requisições individuais, use endpoints de listagem quando possível:
 
 **Ineficiente:**
+
 ```bash
 # 10 requisições individuais
 GET /api/v1/payment/get/payment_1
@@ -196,6 +205,7 @@ GET /api/v1/payment/get/payment_2
 ```
 
 **Eficiente:**
+
 ```bash
 # 1 requisição para listar todos
 GET /api/v1/payment/list?limit=10
@@ -206,6 +216,7 @@ GET /api/v1/payment/list?limit=10
 Se você precisa de maior capacidade, crie múltiplas API Keys e distribua as requisições entre elas:
 
 <CodeGroup>
+
 ```javascript Node.js
 const apiKeys = [
   'vw_live_key1...',
@@ -228,6 +239,7 @@ async function makeRequest(url) {
   });
 }
 ```
+
 ```python Python
 import random
 
@@ -244,6 +256,7 @@ def make_request(url):
     api_key = get_random_api_key()
     return requests.get(url, headers={'X-API-Key': api_key})
 ```
+
 </CodeGroup>
 
 <Warning>
@@ -257,14 +270,13 @@ def make_request(url):
 ```bash
 # Primeiras 25 requisições em 1 segundo - OK
 for i in {1..25}; do
-  curl -H "X-API-Key: sua_key" https://api.syncpay.com.br/api/v1/user/balance
+  curl -H "X-API-Key: sua_key" https://api.stopay.com.br/api/v1/user/balance
 done
 
 # Após 1500 requisições em 1 minuto - 429 Too Many Requests
-curl -H "X-API-Key: sua_key" https://api.syncpay.com.br/api/v1/user/balance
+curl -H "X-API-Key: sua_key" https://api.stopay.com.br/api/v1/user/balance
 # Resposta: {"error": "Too Many Requests", "retryAfter": 60}
 ```
-
 
 ## Boas Práticas
 
@@ -294,9 +306,8 @@ curl -H "X-API-Key: sua_key" https://api.syncpay.com.br/api/v1/user/balance
   <Card title="Pagamentos" icon="credit-card" href="/api-reference/endpoint/payments/create">
     Comece a criar e gerenciar transações PIX
   </Card>
-  
+
   <Card title="Saques" icon="money-bill-transfer" href="/api-reference/endpoint/withdraws/create">
     Aprenda a criar e gerenciar saques
   </Card>
 </CardGroup>
-

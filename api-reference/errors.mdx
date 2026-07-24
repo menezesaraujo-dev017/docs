@@ -1,0 +1,134 @@
+---
+title: "Códigos de Erro"
+description: "Referência completa de todos os erros da API Sto Pay"
+icon: "triangle-exclamation"
+---
+
+A API Sto Pay retorna erros padronizados para facilitar o tratamento na sua aplicação. Todos os erros seguem o mesmo formato JSON.
+
+## Formato do Erro
+
+```json
+{
+  "success": false,
+  "error": "ERROR_CODE",
+  "message": "Descrição legível do erro",
+  "details": {} // opcional, dados adicionais
+}
+```
+
+---
+
+## Erros de Autenticação (401)
+
+| Código | Mensagem | Solução |
+| --- | --- | --- |
+| `MISSING_API_KEY` | API Key não fornecida | Adicione o header `X-API-Key` |
+| `INVALID_API_KEY` | API Key inválida ou expirada | Gere uma nova chave no dashboard |
+| `INACTIVE_API_KEY` | API Key desativada | Reative no painel de configurações |
+
+---
+
+## Erros de Validação (400 / 422)
+
+| Código | Mensagem | Solução |
+| --- | --- | --- |
+| `INVALID_AMOUNT` | Valor inválido | Valor mínimo: R\$ 1,00 |
+| `INVALID_DESCRIPTION` | Descrição ausente ou muito longa | Máx. 255 caracteres |
+| `INVALID_PIX_KEY` | Chave PIX inválida | Verifique o formato da chave |
+| `MISSING_REQUIRED_FIELD` | Campo obrigatório ausente | Consulte o schema do endpoint |
+| `INVALID_EXPIRES_IN` | Expiração inválida | Entre 60 e 86400 segundos |
+
+---
+
+## Erros de Recurso (404)
+
+| Código | Mensagem | Solução |
+| --- | --- | --- |
+| `PAYMENT_NOT_FOUND` | Pagamento não encontrado | Verifique o ID informado |
+| `WITHDRAW_NOT_FOUND` | Saque não encontrado | Verifique o ID informado |
+| `TRANSFER_NOT_FOUND` | Transferência não encontrada | Verifique o ID informado |
+
+---
+
+## Erros de Negócio (422)
+
+| Código | Mensagem | Solução |
+| --- | --- | --- |
+| `INSUFFICIENT_BALANCE` | Saldo insuficiente | Aguarde recebimentos pendentes |
+| `PAYMENT_ALREADY_PAID` | Pagamento já foi pago | Não é possível pagar novamente |
+| `PAYMENT_EXPIRED` | QR Code expirado | Crie um novo pagamento |
+| `PAYMENT_CANCELLED` | Pagamento foi cancelado | Crie um novo pagamento |
+| `WITHDRAW_LIMIT_EXCEEDED` | Limite de saque excedido | Aguarde o próximo período |
+| `DUPLICATE_TRANSACTION` | Transação duplicada | Use um idempotency key único |
+
+---
+
+## Erros de Rate Limit (429)
+
+```json
+{
+  "success": false,
+  "error": "TOO_MANY_REQUESTS",
+  "message": "Rate limit exceeded. Please try again in 5 seconds",
+  "retryAfter": 5
+}
+```
+
+<Note>
+  Consulte a página de [Rate Limiting](/api-reference/rate-limiting) para estratégias de como lidar com este erro.
+</Note>
+
+---
+
+## Erros de Servidor (500)
+
+| Código | Mensagem | Solução |
+| --- | --- | --- |
+| `INTERNAL_ERROR` | Erro interno do servidor | Aguarde e tente novamente |
+| `SERVICE_UNAVAILABLE` | Serviço indisponível | Verifique [status.stopay.com.br](https://status.stopay.com.br) |
+| `GATEWAY_TIMEOUT` | Timeout da requisição | Tente novamente em alguns segundos |
+
+---
+
+## Exemplo de Tratamento Completo
+
+```typescript
+async function createPayment(amount: number) {
+  try {
+    const response = await fetch('https://api.stopay.com.br/api/v1/payment/create', {
+      method: 'POST',
+      headers: {
+        'X-API-Key': process.env.STOPAY_API_KEY!,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ amount, description: 'Pedido #1234' }),
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+      switch (data.error) {
+        case 'INVALID_AMOUNT':
+          throw new Error('Valor deve ser maior que R$ 1,00');
+        case 'MISSING_API_KEY':
+          throw new Error('Configure sua API Key');
+        case 'TOO_MANY_REQUESTS':
+          await sleep(data.retryAfter * 1000);
+          return createPayment(amount); // retry
+        default:
+          throw new Error(data.message);
+      }
+    }
+
+    return data;
+  } catch (err) {
+    console.error('Falha ao criar pagamento:', err);
+    throw err;
+  }
+}
+```
+
+<Tip>
+  Sempre verifique o campo `error` da resposta antes de `message`, pois ele é estável entre versões da API.
+</Tip>

@@ -1,17 +1,17 @@
 ---
 title: "Visão Geral da API"
-description: "Guia completo para integração com o ecossistema Sync Pay"
+description: "Guia completo para integração com o ecossistema Sto Pay"
 icon: "code"
 ---
 
-A API da **Sync Pay** foi projetada para ser simples, rápida e segura. Baseada em padrões REST, ela permite que desenvolvedores integrem fluxos complexos de pagamentos e recebimentos com poucas linhas de código.
+A API da **Sto Pay** foi projetada para ser simples, rápida e segura. Baseada em padrões REST, ela permite que desenvolvedores integrem fluxos complexos de pagamentos e recebimentos com poucas linhas de código.
 
 ## Endpoints de Produção
 
 Todas as requisições devem ser direcionadas para o nosso servidor de produção:
 
 <Card title="Base URL" icon="link">
-  `https://api.syncpay.com.br`
+  `https://api.stopay.com.br`
 </Card>
 
 <Warning>
@@ -27,11 +27,13 @@ Para interagir com nossa API, você precisa de uma **API Key**. Esta chave é pe
 Adicione sua chave ao header de cada requisição utilizando um dos métodos abaixo:
 
 **Método Recomendado (Header Customizado):**
+
 ```http
 X-API-Key: sua_api_key_aqui
 ```
 
 **Método Padrão (Bearer Token):**
+
 ```http
 Authorization: Bearer sua_api_key_aqui
 ```
@@ -43,6 +45,7 @@ Authorization: Bearer sua_api_key_aqui
 Nossa API utiliza o formato JSON para todas as respostas. Cada resposta contém um booleano `success` para facilitar o tratamento de erros no seu código.
 
 ### Exemplo de Sucesso (200 OK)
+
 ```json
 {
   "success": true,
@@ -55,6 +58,7 @@ Nossa API utiliza o formato JSON para todas as respostas. Cada resposta contém 
 ```
 
 ### Exemplo de Erro (400 Bad Request)
+
 ```json
 {
   "success": false,
@@ -65,14 +69,31 @@ Nossa API utiliza o formato JSON para todas as respostas. Cada resposta contém 
 
 ---
 
+## Códigos de Status HTTP
+
+| Código | Significado | Quando ocorre |
+| --- | --- | --- |
+| `200` | OK | Requisição processada com sucesso |
+| `201` | Created | Recurso criado com sucesso |
+| `400` | Bad Request | Parâmetros inválidos ou ausentes |
+| `401` | Unauthorized | API Key inválida ou ausente |
+| `403` | Forbidden | Sem permissão para este recurso |
+| `404` | Not Found | Recurso não encontrado |
+| `422` | Unprocessable Entity | Dados semanticamente inválidos |
+| `429` | Too Many Requests | Rate limit excedido |
+| `500` | Internal Server Error | Erro interno do servidor |
+
+---
+
 ## Ambientes e Testes
 
-Atualmente, todas as integrações ocorrem diretamente em nosso ambiente principal. Recomendamos realizar testes com valores mínimos (R$ 1,00) para validar seu fluxo de integração antes de entrar em escala.
+Atualmente, todas as integrações ocorrem diretamente em nosso ambiente principal. Recomendamos realizar testes com valores mínimos (R\$ 1,00) para validar seu fluxo de integração antes de entrar em escala.
 
 <CardGroup cols={2}>
   <Card title="Rate Limiting" icon="gauge-high" href="/api-reference/rate-limiting">
     Entenda os limites de requisições para manter sua aplicação estável.
   </Card>
+
   <Card title="Webhooks" icon="bell" href="/api-reference/endpoint/user/webhook">
     Aprenda a configurar notificações automáticas para seu servidor.
   </Card>
@@ -84,6 +105,6 @@ Atualmente, todas as integrações ocorrem diretamente em nosso ambiente princip
 
 Se encontrar qualquer dificuldade durante a integração, nossa equipe técnica está disponível para ajudar através do nosso canal oficial.
 
-<Button href="https://t.me/syncpay" icon="telegram" variant="filled">
+<Button href="https://t.me/stopay" icon="telegram" variant="filled">
   Falar com Suporte Técnico
 </Button>
