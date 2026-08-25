@@ -36,11 +36,20 @@
         "groups": [
           {
             "group": "Visão Geral",
-            "pages": []
+            "pages": [
+              "app/overview",
+              "app/login"
+            ]
           },
           {
             "group": "Funcionalidades",
-            "pages": []
+            "pages": [
+              "app/bots",
+              "app/loja",
+              "app/sorteios",
+              "app/tickets",
+              "app/seguranca"
+            ]
           },
           {
             "group": "Ajuda",
@@ -65,7 +74,10 @@
           },
           {
             "group": "Recursos",
-            "pages": []
+            "pages": [
+              "partners/faq",
+              "partners/boas-praticas"
+            ]
           }
         ]
       }
