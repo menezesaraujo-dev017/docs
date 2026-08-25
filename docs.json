@@ -21,6 +21,12 @@
               "index",
               "about-us"
             ]
+          },
+          {
+            "group": "Primeiros Passos",
+            "pages": [
+              "quickstart"
+            ]
           }
         ]
       },
@@ -29,27 +35,18 @@
         "icon": "mobile",
         "groups": [
           {
-            "group": "Primeiros Passos",
-            "pages": [
-              "app/overview",
-              "app/login"
-            ]
+            "group": "Visão Geral",
+            "pages": []
           },
           {
-            "group": "Recursos",
-            "pages": [
-              "app/bots",
-              "app/loja",
-              "app/sorteios",
-              "app/tickets",
-              "app/pagamentos"
-            ]
+            "group": "Funcionalidades",
+            "pages": []
           },
           {
             "group": "Ajuda",
             "pages": [
-              "app/ids",
-              "app/faq"
+              "app/faq",
+              "app/ids"
             ]
           }
         ]
@@ -67,19 +64,8 @@
             ]
           },
           {
-            "group": "Tipos de Integração",
-            "pages": [
-              "partners/gateways",
-              "partners/lojas",
-              "partners/outros"
-            ]
-          },
-          {
-            "group": "Recursos para Parceiros",
-            "pages": [
-              "partners/faq",
-              "partners/boas-praticas"
-            ]
+            "group": "Recursos",
+            "pages": []
           }
         ]
       }

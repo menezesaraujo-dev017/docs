@@ -4,123 +4,44 @@ sidebarTitle: "Boas Práticas"
 description: "Guia de boas práticas técnicas e operacionais para parceiros que integram com a Sync Apps: segurança, performance e UX."
 ---
 
-Ser um parceiro da Sync Apps é mais do que integrar uma API: é fazer parte de um ecossistema de pagamentos confiável, rápido e seguro. Este guia reúne as melhores práticas técnicas e operacionais que recomendamos a todos os parceiros, desde startups em crescimento até plataformas enterprise. Seguindo essas diretrizes, você garante uma experiência excelente para seus clientes finais e reduz riscos operacionais.
+Esta página reúne as principais recomendações para parceiros que já foram aprovados e estão integrando ou operando com a Sync Apps. Seguir essas boas práticas garante uma experiência melhor para seus clientes e evita problemas comuns de suporte.
 
-## Seguranca
+## Segurança
 
-A segurança da sua integração reflete diretamente na segurança dos seus clientes. Não deixe nenhuma brecha.
-
-### Práticas essenciais
-
-- **Use cofres de segredos** (`AWS Secrets Manager`, `Azure Key Vault`, `HashiCorp Vault`) para armazenar API Keys e Webhook Secrets. Nunca versione esses valores em repositórios Git.
-- **Separe ambientes** — Mantenha endpoints de webhook, chaves de API e bancos de dados isolados entre desenvolvimento, staging e produção.
-- **Valide assinaturas** — Sempre verifique o cabeçalho `X-Sync-Signature` em todo webhook recebido. Um endpoint que aceita qualquer payload está vulnerável a ataques de replay e spoofing.
-- **Nunca exponha a API Key no frontend** — Chamadas à Sync Apps devem sempre sair do seu backend. Se precisa de dados no front, crie um endpoint próprio autenticado.
-- **Rotacione chaves a cada 90 dias** — Estabeleça uma política interna e automatize via scripts de CI/CD.
-- **Restrinja IPs** — Configure allowlists tanto no seu firewall quanto no dashboard da Sync Apps quando disponível.
-- **Revogue chaves de desligados** — Sempre que um desenvolvedor sair, revogue imediatamente as chaves associadas.
+- **Não compartilhe credenciais de acesso** ao painel com pessoas não autorizadas. Cada membro do time deve ter o próprio acesso.
+- **Encerre sessões inativas** quando não estiver usando o painel. Acesse Configurações \> Segurança para gerenciar sessões ativas.
+- **Ative o 2FA no Discord** da conta vinculada à Sync Apps. Como o login é via Discord OAuth, a segurança da conta Discord é diretamente a segurança do painel.
+- **Comunique a equipe imediatamente** em caso de acesso suspeito ou comprometimento de conta.
 
 <Warning>
-  Uma API Key vazada em repositório público pode ser descoberta por scanners automatizados em minutos. Use ferramentas como `git-secrets` ou `truffleHog` para prevenir commits acidentais.
+  A Sync Apps jamais solicita sua senha, token do Discord ou qualquer credencial por mensagem. Desconfie de qualquer contato pedindo essas informações — trata-se de phishing.
 </Warning>
 
-## Performance
+## Comunicação com seus Clientes
 
-Uma integração rápida significa uma experiência de pagamento fluida para o cliente final. Veja como otimizar.
+- **Use linguagem simples** ao explicar funcionalidades. Evite jargões técnicos com usuários finais não-técnicos.
+- **Seja transparente** sobre limitações. Se o sistema de loja está em fase de atualizações, informe seus clientes para que tenham expectativas alinhadas.
+- **Oriente seus usuários a usarem os tickets** para suporte técnico, nunca o Discord direto da Sync Apps.
 
-### Dicas de otimização
+## Testes e Homologação
 
-1. **Use HTTP/2** — A API da Sync Apps suporta HTTP/2. Mantenha conexões persistentes (keep-alive) para reduzir o overhead de handshake TLS.
-2. **Batch quando possível** — Se precisa consultar múltiplos pagamentos, use filtros de data e paginação em vez de múltiplas chamadas individuais.
-3. **Cache leituras seguras** — Dados como configurações de conta e saldo podem ser cacheados por alguns segundos para reduzir latência percebida.
-4. **Processe webhooks em filas** — Use workers assíncronos (SQS, Celery, Bull, Sidekiq) para não bloquear a resposta HTTP 200.
-5. **Monitore latência** — Instrumente suas chamadas à API com APMs (New Relic, Datadog, Sentry) para identificar gargalos.
-6. **Retry inteligente** — Faça retry apenas em erros 5xx e 429. Não retry erros 4xx (exceto 429), pois eles indicam problema na requisição, não na API.
-7. **Paginação eficiente** — Sempre use `limit` e `cursor` em endpoints paginados. Nunca carregue tudo de uma vez.
+- **Teste antes de lançar** qualquer funcionalidade nova para seus usuários. Use um servidor de teste no Discord para validar o comportamento dos bots, sorteios e da loja.
+- **Documente os IDs** dos seus recursos de teste (bots, lojas, sorteios) para facilitar diagnósticos em caso de problema.
+- **Valide o fluxo completo** antes de comunicar seus clientes sobre uma nova integração.
 
 <Tip>
-  Uma boa prática é manter um circuit breaker entre sua aplicação e a Sync Apps. Se a API apresentar instabilidade temporária, o circuit breaker evita sobrecarregar ainda mais e permite failover elegante.
+  Crie um servidor Discord dedicado a testes da sua integração. Isso evita que experimentos afetem servidores reais dos seus clientes.
 </Tip>
 
-## Gestao de Webhooks
+## Suporte e Tickets
 
-Webhooks são o ponto mais crítico da integração. Se mal gerenciados, causam duplicidade, perda de eventos e inconsistência de dados.
+- **Sempre informe o ID do recurso afetado** ao abrir um ticket — seja o ID do bot, da loja, do sorteio ou do pagamento. Isso agiliza muito o atendimento.
+- **Descreva com clareza** o problema: o que estava tentando fazer, o que aconteceu e quando ocorreu.
+- **Inclua prints ou evidências** quando possível.
+- **Não abra múltiplos tickets** sobre o mesmo problema. Se precisar adicionar informações, responda no ticket já aberto.
 
-### Checklist de gestão
+## Uso da Marca
 
-<Steps>
-  <Step title="Registre o evento imediatamente">
-    Assim que receber o webhook, persista o payload bruto em uma tabela de eventos antes de qualquer processamento. Isso serve como fonte de verdade para auditoria.
-  </Step>
-  <Step title="Valide a assinatura">
-    Sempre verifique `X-Sync-Signature` antes de aceitar o payload. Rejeite imediatamente se a assinatura não conferir.
-  </Step>
-  <Step title="Implemente idempotência">
-    Use o campo `data.id` como chave única. Se o mesmo ID chegar duas vezes (retentativa), ignore o segundo processamento.
-  </Step>
-  <Step title="Responda rapidamente">
-    Responda HTTP 200 em menos de 5 segundos. Processamentos pesados devem ser delegados a filas assíncronas.
-  </Step>
-  <Step title="Monitore falhas">
-    Configure alertas para taxas de erro de webhook acima de 5%. Falhas recorrentes geralmente indicam bugs no endpoint ou instabilidade da sua infraestrutura.
-  </Step>
-</Steps>
-
-<Warning>
-  Nunca retorne erro 4xx ou 5xx para webhooks por falha no seu processamento interno. Isso aciona retentativas e pode gerar múltiplas execuções da mesma lógica de negócio. Sempre retorne 200 e trate erros internamente.
-</Warning>
-
-## Documentacao para seus Clientes
-
-Se você é um parceiro que oferece a Sync Apps embarcada em seu produto (white-label ou SaaS), sua documentação interna se torna a documentação do cliente final.
-
-### Como documentar bem
-
-- **Use linguagem simples** — Evite jargões técnicos quando o público for não-técnico. "Copie e cole o código PIX" é melhor que "Utilize o payload Copia e Cola do BR Code".
-- **Inclua screenshots** — Mostre onde o usuário clica, onde cola a chave PIX, onde confirma o pagamento.
-- **Ofereça um fluxo de teste** — Instruções claras de como o cliente pode fazer um pagamento de R\$ 1,00 para validar a integração.
-- **Canais de suporte** — Informe claramente como o cliente final deve proceder em caso de problemas (delay no webhook, pagamento não confirmado, etc.).
-- **Mantenha atualizado** — Cada vez que a Sync Apps lança uma nova versão da API, revise sua documentação para refletir mudanças.
-
-## Testes antes de ir para Producao
-
-Antes de habilitar pagamentos reais para seus usuários, execute este checklist rigoroso:
-
-<Steps>
-  <Step title="Teste de geração de QR Code">
-    Crie um pagamento de R\$ 1,00 e verifique se o QR Code é gerado corretamente, com payload válido.
-  </Step>
-  <Step title="Teste de pagamento completo">
-    Efetue o pagamento via app do banco e confirme se o webhook `payment.confirmed` chega em até 30 segundos.
-  </Step>
-  <Step title="Teste de expiração">
-    Crie um pagamento com expiração curta (5 minutos) e aguarde o webhook `payment.expired`.
-  </Step>
-  <Step title="Teste de webhook inválido">
-    Envie um payload com assinatura errada e confirme que seu endpoint rejeita corretamente com 401.
-  </Step>
-  <Step title="Teste de idempotência">
-    Simule uma retentativa enviando o mesmo payload duas vezes. Verifique se seu sistema processa apenas uma vez.
-  </Step>
-  <Step title="Teste de saldo insuficiente">
-    Tente criar um saque maior que o saldo disponível e confirme o erro `INSUFFICIENT_BALANCE`.
-  </Step>
-  <Step title="Teste de carga">
-    Envie 100 webhooks simultâneos para seu endpoint e verifique se ele responde HTTP 200 para todos sem perda.
-  </Step>
-  <Step title="Teste de timeout">
-    Simule uma lentidão no seu processamento e confirme que a Sync Apps reage com retentativas adequadas.
-  </Step>
-</Steps>
-
-<Warning>
-  Mesmo em produção, nunca faça testes com valores altos. Use sempre R\$ 1,00 ou valores mínimos para evitar movimentação desnecessária de fundos.
-</Warning>
-
-<Tip>
-  Configure dashboards de monitoramento (Grafana, Datadog, CloudWatch) para acompanhar taxa de sucesso de webhooks, latência da API e saldo da conta. A prevenção é o melhor remédio!
-</Tip>
-
----
-
-Seguindo essas práticas, você garante uma integração robusta, segura e escalável. Seu sucesso como parceiro é o nosso sucesso!
+- Use o nome **Sync Apps** corretamente. Não utilize variações como "SyncApps", "Sync-Apps" ou outros formatos não oficiais.
+- O uso do logotipo e outros ativos visuais da Sync Apps é permitido apenas conforme as diretrizes compartilhadas durante o onboarding.
+- Em dúvida sobre como usar a marca em um contexto específico, consulte o suporte de parceiros antes de publicar.

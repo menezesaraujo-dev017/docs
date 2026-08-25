@@ -1,3 +1,38 @@
 ---
-title: "bots"
+title: "Gerenciando Bots na Sync Apps"
+sidebarTitle: "Bots"
+description: "Aprenda a criar, configurar e gerenciar bots do Discord na Sync Apps. Cada bot possui um ID unico para identificacao e suporte."
 ---
+
+Na Sync Apps, os bots sao a base da sua automacao no Discord. Cada bot e uma instancia independente com seu proprio conjunto de comandos, configuracoes e um ID unico que o identifica na plataforma. Com um bot, voce pode moderar sua comunidade, responder comandos e integrar recursos como loja, sorteios e tickets.
+
+<Steps>
+  <Step title="Adicione um bot ao Discord">
+    Acesse o painel da Sync Apps e va ate a secao **Bots**. Clique em **Adicionar Bot** e siga o fluxo de autorizacao com o Discord para vincular o bot ao seu servidor.
+  </Step>
+  <Step title="Visualize o ID do bot">
+    Apos a criacao, o bot recebe um ID unico no formato hexadecimal de 24 caracteres, como `6a7504d0828228c7b19af029`. Esse ID aparece na pagina de detalhes do bot e serve para identifica-lo em tickets e integracoes.
+  </Step>
+  <Step title="Configure comandos e permissoes">
+    Dentro do painel do bot, ajuste os comandos disponiveis, permissoes de canal e cargos que podem interagir com ele. Salve as alteracoes para que elas entrem em vigor no Discord.
+  </Step>
+</Steps>
+
+<Tip>
+  Sempre informe o **ID do bot** ao abrir um ticket de suporte ou ao usar rotas para enviar dados ao bot. Isso agiliza o atendimento e garante que a acao seja direcionada ao bot correto.
+</Tip>
+
+<AccordionGroup>
+  <Accordion title="Como envio dados/acoes para o meu bot?">
+    O aplicativo da Sync Apps possui rotas internas para comunicar acoes e dados ao seu bot. Para utilizar essas rotas, acesse a secao correspondente no painel e informe o ID do bot quando solicitado. Os detalhes tecnicos das rotas ficam disponiveis dentro da interface da plataforma.
+  </Accordion>
+
+  <Accordion title="Meu bot parou de responder. O que fazer?">
+    Se o bot nao estiver respondendo no Discord, verifique os seguintes pontos:
+
+    - Confirme se o bot ainda esta online no servidor do Discord.
+    - Verifique se as permissoes do bot nao foram alteradas recentemente.
+    - Reinicie o bot pelo painel da Sync Apps, se a opcao estiver disponivel.
+    - Caso o problema persista, abra um ticket de suporte informando o **ID do bot** para que a equipe possa investigar.
+  </Accordion>
+</AccordionGroup>

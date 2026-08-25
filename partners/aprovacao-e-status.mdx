@@ -1,89 +1,63 @@
 ---
-title: "Acompanhar Status da Inscricao de Parceiro"
-sidebarTitle: "Aprovacao e Status"
-description: "Saiba onde e como acompanhar o status da sua inscricao: aprovado, rejeitado ou em analise, no portal e no Discord."
+title: "Acompanhar Status da Inscrição de Parceiro"
+sidebarTitle: "Aprovação e Status"
+description: "Saiba como verificar o status da sua inscrição no Programa de Parceiros da Sync Apps e o que cada situação significa."
 ---
 
-Apos enviar sua inscricao no Portal de Parceiros da Sync Apps, o proximo passo e acompanhar o status da analise. Todo o fluxo de aprovacao e transparente e acessivel por dois canais simultaneos: o proprio portal e o Discord. Nesta pagina, voce entende o que significa cada status, onde verificar, o que fazer se for aprovado e como proceder em caso de rejeicao. Tambem respondemos as duvidas mais comuns sobre prazos, reenvio e multiplas inscricoes.
+Após enviar sua inscrição pelo portal [partners.syncapps.com.br](https://partners.syncapps.com.br), você pode acompanhar o andamento pelo próprio portal e também pelo Discord. Esta página explica o que cada status significa e o que fazer em cada caso.
 
-## Status Possiveis
-
-Cada inscricao passa por uma de tres situacoes durante o ciclo de vida. Entenda o que cada uma significa e quais acoes voce deve tomar:
+## Os Três Status Possíveis
 
 <CardGroup cols={3}>
-  <Card title="Em Analise">
-    Sua inscricao foi recebida e esta na fila de revisao da equipe de parcerias. Durante esse periodo, voce pode receber perguntas adicionais pelo Discord. O prazo medio e de ate 48 horas uteis, mas pode ser estendido se forem solicitados ajustes ou documentos extras.
+  <Card title="Em Análise" icon="clock">
+    Sua inscrição foi recebida e está sendo avaliada pela equipe. Aguarde o prazo de até 7 dias úteis.
   </Card>
 
-  <Card title="Aprovado">
-    Parabens! Sua proposta foi aceita e voce agora e um parceiro oficial da Sync Apps. Voce recebera acesso ao ambiente de sandbox, convite para o canal exclusivo de parceiros no Discord e instrucoes para iniciar a integracao tecnica.
+  <Card title="Aprovado" icon="circle-check">
+    Parabéns! Sua inscrição foi aceita. Você recebeu ou receberá instruções de onboarding.
   </Card>
 
-  <Card title="Rejeitado">
-    A inscricao nao atendeu aos criterios de aprovacao neste momento. Voce recebera um feedback detalhado explicando os motivos da rejeicao. Nao ha limite de tentativas: voce pode corrigir os pontos apontados e reenviar quando estiver pronto.
+  <Card title="Rejeitado" icon="circle-xmark">
+    A inscrição não foi aprovada neste momento. Você pode revisar o projeto e tentar novamente após 30 dias.
   </Card>
 </CardGroup>
 
 ## Onde Verificar o Status
 
-Voce tem dois canais oficiais para acompanhar o andamento da sua inscricao. Recomendamos consultar ambos, pois as notificacoes sao enviadas simultaneamente.
+Você pode acompanhar sua inscrição em dois lugares:
 
-### No Portal de Parceiros
-
-Acesse [https://partners.syncapps.com.br](https://partners.syncapps.com.br) e faca login com sua conta Sync Apps. Na secao **"Minhas Inscricoes"**, voce encontra uma lista com todas as submissoes enviadas, o numero do protocolo, a data de envio e o status atual. Clique em qualquer inscricao para ver o historico completo de atualizacoes, incluindo mensagens da equipe de analise.
-
-### No Discord (DM)
-
-Todas as notificacoes de mudanca de status sao enviadas automaticamente por mensagem direta do bot oficial da Sync Apps. Isso inclui:
-
-- Confirmacao de recebimento da inscricao
-- Alerta de solicitacao de informacoes adicionais
-- Notificacao de aprovacao com link para o proximo passo
-- Notificacao de rejeicao com feedback detalhado
-
-Certifique-se de que seu perfil no Discord permite receber DMs de membros de servidores em comum.
-
-## Se Voce For Aprovado
-
-A aprovacao e apenas o comeco. Aqui esta a lista de acoes que voce deve realizar para ativar sua parceria de forma completa:
-
-- **Acesse o ambiente de sandbox**: voce recebera credenciais de API de teste para desenvolver e validar sua integracao sem movimentar dinheiro real
-- **Entre no canal de parceiros no Discord**: esse canal e exclusivo para parceiros aprovados e e onde acontecem os anuncios de novas features, sessoes de Q&A e networking com outros integradores
-- **Leia a documentacao exclusiva**: parceiros tem acesso a guias tecnicos avancados, exemplos de codigo otimizados e fluxos de webhook detalhados
-- **Agende uma sessao de onboarding (opcional)**: nossa equipe oferece sessoes de 30 minutos para tirar duvidas tecnicas e alinhar expectativas comerciais
-- **Inicie o desenvolvimento da integracao**: use os endpoints de teste para simular o fluxo completo: criacao de cobranca, geracao de QR Code, pagamento simulado e recebimento de webhook
-- **Solicite liberacao para producao**: quando a integracao estiver validada no sandbox, envie uma solicitacao de migracao para o ambiente de producao
-
-## Se Voce For Rejeitado
-
-Uma rejeicao nao e o fim do processo. Nossa equipe fornece feedback construtivo para que voce possa melhorar e tentar novamente.
-
-- **Leia o feedback com atencao**: a mensagem de rejeicao no Discord detalha exatamente quais criterios nao foram atendidos e por que
-- **Corrija os pontos apontados**: os motivos mais comuns de rejeicao sao descricao tecnica incompleta, produto sem URL funcional, categoria incorreta ou falta de clareza sobre o publico-alvo
-- **Nao ha limite de tentativas**: voce pode reenviar sua inscricao quantas vezes forem necessarias. Cada novo envio e analisado do zero
-- **Use o suporte para tirar duvidas**: antes de reenviar, voce pode abrir um ticket no Discord para esclarecer dividas sobre o feedback recebido
-- **Reenvie quando estiver pronto**: acesse o portal, edite sua inscricao anterior ou crie uma nova submissao com as correcoes aplicadas
-
-## Duvidas Frequentes
-
-<AccordionGroup>
-  <Accordion title="Nao recebi DM no Discord. O que fazer?">
-    Primeiro, verifique se voce esta no servidor oficial da Sync Apps no Discord. Depois, confirme nas configuracoes de privacidade do seu perfil que as mensagens diretas estao habilitadas para "membros de servidores em comum". Se ainda assim nao receber, envie uma mensagem no canal geral do servidor mencionando @parcerias ou entre em contato pelo [Telegram de suporte](https://t.me/syncapps).
-  </Accordion>
-
-  <Accordion title="Posso reenviar apos rejeicao?">
-    Sim, e incentivado. Nao existe limite de tentativas. Analise o feedback, faca os ajustes necessarios e submeta uma nova inscricao pelo portal. Cada submissao e avaliada independentemente, entao uma rejeicao anterior nao prejudica sua chance na proxima tentativa.
-  </Accordion>
-
-  <Accordion title="Quanto tempo demora para receber o resultado?">
-    O prazo padrao e de ate 48 horas uteis apos o envio completo. Se forem solicitados documentos adicionais ou ajustes, o prazo e pausado ate que voce responda. Inscricoes enviadas em feriados ou finais de semana comecam a contar no proximo dia util.
-  </Accordion>
-
-  <Accordion title="Posso ter mais de uma inscricao ativa?">
-    Sim, voce pode submeter inscricoes para categorias diferentes (por exemplo, uma como gateway e outra como loja virtual) ou para projetos distintos dentro da mesma empresa. Cada inscricao recebe um protocolo unico e e analisada separadamente.
-  </Accordion>
-</AccordionGroup>
+1. **Portal de Parceiros**: acesse [partners.syncapps.com.br](https://partners.syncapps.com.br), faça login com o Discord e vá até "Minhas Inscrições". O status é atualizado em tempo real.
+2. **DM no Discord**: quando houver uma decisão, você receberá uma mensagem direta no Discord da conta vinculada à inscrição.
 
 <Note>
-  **Notificacoes simultaneas**: sempre que houver uma mudanca de status, voce recebera notificacao tanto no portal quanto no Discord. Se uma das notificacoes nao chegar, verifique a outra. O portal mantem o historico completo, enquanto o Discord e o canal mais rapido para alertas em tempo real.
+  Certifique-se de que suas DMs estejam abertas para receber a notificação. Se não receber a mensagem, verifique o status diretamente no portal.
 </Note>
+
+## O Que Fazer em Cada Situação
+
+<AccordionGroup>
+  <Accordion title="Minha inscrição está há mais de 7 dias como Em Análise">
+    Em períodos de alto volume, o prazo pode ser um pouco maior. Se já passou de 10 dias úteis sem resposta, entre em contato pelo Telegram [@syncapps](https://t.me/syncapps) informando o nome do projeto inscrito para verificar o andamento.
+  </Accordion>
+
+  <Accordion title="Fui aprovado. Quais são os próximos passos?">
+    Após a aprovação você receberá instruções para:
+
+    1. Acessar o painel de parceiros
+    2. Ler a documentação exclusiva para parceiros
+    3. Entrar no canal de suporte dedicado
+    4. Iniciar o processo de onboarding com a equipe da Sync Apps
+  </Accordion>
+
+  <Accordion title="Fui rejeitado. Por qual motivo?">
+    A mensagem de rejeição costuma incluir um breve motivo. Os mais comuns são: descrição do projeto muito genérica, público-alvo não alinhado com o ecossistema Sync Apps, ou projeto ainda em fase muito inicial sem demonstração de viabilidade.
+  </Accordion>
+
+  <Accordion title="Posso me inscrever novamente após rejeição?">
+    Sim, após 30 dias. Use esse período para revisar seu projeto com base no feedback recebido e deixar a próxima inscrição mais detalhada e convincente.
+  </Accordion>
+
+  <Accordion title="Posso editar minha inscrição após o envio?">
+    Inscrições em análise não podem ser editadas. Caso precise corrigir informações importantes, entre em contato pelo Telegram antes que a análise seja concluída.
+  </Accordion>
+</AccordionGroup>

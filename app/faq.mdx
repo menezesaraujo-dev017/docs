@@ -1,237 +1,137 @@
 ---
 title: "Perguntas Frequentes sobre o App Sync Apps"
-sidebarTitle: "FAQ do App"
-description: "Tire todas as suas dúvidas sobre o app.syncapps.com: login, conta, pagamentos PIX, saques, segurança, API Keys e suporte."
+sidebarTitle: "FAQ"
+description: "Respostas rápidas sobre login, bots, loja, sorteios, tickets, saques e segurança na Sync Apps. Encontre soluções para as dúvidas mais comuns."
 ---
 
-Esta página reúne as dúvidas mais comuns dos usuários do **app.syncapps.com**. Use o índice abaixo para navegar rapidamente pela seção que precisa.
+Esta página reúne as perguntas mais frequentes sobre o app da Sync Apps. Se não encontrar a resposta que procura, acesse a seção correspondente no painel ou entre em contato com o suporte.
+
+## Navegue por tópico
 
 <CardGroup cols={3}>
-  <Card title="Conta e Acesso" icon="user" href="#conta-e-acesso">
+  <Card title="Login e Conta" icon="user" href="#login-e-conta">
+    Acesso, OAuth do Discord e gerenciamento de conta
   </Card>
 
-  <Card title="Pagamentos" icon="qrcode" href="#pagamentos">
+  <Card title="Bots" icon="bot" href="#bots">
+    Criação, configuração e IDs dos bots
   </Card>
 
-  <Card title="Saques" icon="money-bill-transfer" href="#saques">
+  <Card title="Loja" icon="store" href="#loja">
+    Produtos, atualizações e funcionamento da loja
   </Card>
 
-  <Card title="API Keys" icon="key" href="#api-keys">
+  <Card title="Sorteios" icon="ticket" href="#sorteios">
+    Criação e participação em sorteios
   </Card>
 
-  <Card title="Segurança" icon="shield-halved" href="#seguranca">
+  <Card title="Tickets" icon="headset" href="#tickets">
+    Abertura e acompanhamento de chamados
   </Card>
 
-  <Card title="Suporte" icon="headset" href="#suporte">
+  <Card title="Saques" icon="money-bill" href="#saques">
+    Retirada de saldo e destinos cadastrados
   </Card>
 </CardGroup>
 
 ---
 
-## Conta e Acesso
+## Login e Conta
 
 <AccordionGroup>
-  <Accordion title="Como crio uma conta na Sync Apps?">
-    Acesse [app.syncapps.com](https://app.syncapps.com) e clique em **Criar conta**. Preencha seu nome, e-mail e uma senha segura. Você receberá um e-mail de verificação — clique no link para ativar a conta e acessar o painel.
+  <Accordion title="Como faço login na Sync Apps?">
+    O login é feito exclusivamente via **Discord OAuth**. Na tela inicial, clique em entrar com Discord e autorize o aplicativo. Não existe login com e-mail e senha.
   </Accordion>
 
-  <Accordion title="Esqueci minha senha. Como redefinir?">
-    Na tela de login, clique em **Esqueci minha senha**. Informe o e-mail cadastrado e você receberá um link de redefinição em até 5 minutos. Verifique também a caixa de spam. O link expira em 30 minutos.
+  <Accordion title="Posso vincular mais de uma conta do Discord?">
+    Cada conta na Sync Apps está vinculada a um único login do Discord. Para gerenciar outra conta, você precisa fazer logout e autorizar com outro Discord.
   </Accordion>
 
-  <Accordion title="Posso ter mais de uma conta com o mesmo e-mail?">
-    Não. Cada e-mail está vinculado a uma única conta. Se precisar de múltiplos ambientes (ex: conta pessoal e empresarial), utilize e-mails diferentes para cada cadastro.
-  </Accordion>
-
-  <Accordion title="Como altero meu e-mail ou dados cadastrais?">
-    Acesse **Configurações → Perfil** no painel. Você pode atualizar nome, telefone e outros dados. Para alterar o e-mail principal, entre em contato com o suporte, pois essa ação requer verificação de identidade.
-  </Accordion>
-
-  <Accordion title="Posso acessar o app por múltiplos dispositivos ao mesmo tempo?">
-    Sim. O app.syncapps.com funciona em qualquer navegador. Você pode estar logado em vários dispositivos simultaneamente. Para ver e encerrar sessões ativas, acesse **Configurações → Segurança → Sessões ativas**.
-  </Accordion>
-
-  <Accordion title="O app tem versão mobile?">
-    O app.syncapps.com é totalmente responsivo e funciona no navegador do celular sem necessidade de instalação. Um app nativo para iOS e Android está nos planos futuros da plataforma.
-  </Accordion>
-
-  <Accordion title="Minha conta foi suspensa. O que fazer?">
-    Contas podem ser suspensas por atividades suspeitas ou violação dos termos de uso. Entre em contato com o suporte pelo Telegram [@syncapps](https://t.me/syncapps) para entender o motivo e, se aplicável, solicitar a reativação.
+  <Accordion title="Como encerro sessões ativas em outros dispositivos?">
+    Acesse **Configurações \> Segurança** no painel e encerre as sessões que não reconhecer. Isso desconecta o acesso imediatamente.
   </Accordion>
 </AccordionGroup>
 
----
-
-## Pagamentos
+## Bots
 
 <AccordionGroup>
-  <Accordion title="Como visualizo os pagamentos recebidos?">
-    No painel principal, acesse a seção **Pagamentos**. Você verá a lista completa de transações com status, valor, data e dados do pagador. Use os filtros para buscar por período, status ou valor.
+  <Accordion title="Como crio um bot na Sync Apps?">
+    Após fazer login, acesse a seção de bots no painel e siga o fluxo de criação. Cada bot recebe um ID único no formato hexadecimal de 24 caracteres.
   </Accordion>
 
-  <Accordion title="Quais são os possíveis status de um pagamento?">
-    | Status | Descrição |
-    | --- | --- |
-    | `pending` | Aguardando pagamento pelo cliente |
-    | `paid` | PIX recebido e confirmado |
-    | `expired` | QR Code expirou sem pagamento |
-    | `refunded` | Pagamento devolvido ao pagador |
-    | `cancelled` | Cancelado antes do pagamento |
-
-    Pagamentos com status `paid` têm o saldo creditado imediatamente na sua conta.
+  <Accordion title="Onde encontro o ID do meu bot?">
+    O ID do bot é exibido na lista de bots e na página de detalhes de cada um. Ele tem o formato `6a7504d0828228c7b19af029`.
   </Accordion>
 
-  <Accordion title="Quanto tempo leva para o pagamento ser confirmado?">
-    Os pagamentos PIX são confirmados em tempo real, normalmente em menos de 10 segundos após o pagador efetuar o PIX. Assim que confirmado, o status muda para `paid` e o webhook é disparado para a URL configurada.
-  </Accordion>
-
-  <Accordion title="Por quanto tempo o QR Code / link de pagamento fica válido?">
-    Por padrão, os QR Codes expiram em **30 minutos**. Você pode configurar um tempo personalizado ao criar o pagamento via API (parâmetro `expires_in`), com valores entre 1 minuto e 24 horas.
-  </Accordion>
-
-  <Accordion title="Posso emitir um reembolso pelo painel?">
-    Sim. Localize o pagamento na lista, clique em **Detalhes** e depois em **Reembolsar**. O valor é devolvido instantaneamente ao pagador via PIX. Atenção: reembolsos são irreversíveis.
-  </Accordion>
-
-  <Accordion title="Como exporto o histórico de pagamentos?">
-    Acesse **Pagamentos → Exportar**. Você pode exportar em formato CSV ou PDF, com filtros por período, status e valor. O arquivo será gerado e enviado para seu e-mail cadastrado.
-  </Accordion>
-
-  <Accordion title="Existe limite de valor por pagamento?">
-    Não há um limite fixo imposto pela Sync Apps. Os limites são os do próprio sistema PIX do Banco Central, que variam por horário (até R\$ 1.000 no período noturno para algumas instituições). Pagamentos de alto valor podem passar por revisão de segurança.
+  <Accordion title="Posso enviar ações ao meu bot pelo painel?">
+    Sim. A Sync Apps disponibiliza rotas para enviar ações e dados ao bot diretamente pela dashboard.
   </Accordion>
 </AccordionGroup>
 
----
+## Loja
+
+<AccordionGroup>
+  <Accordion title="A loja da Sync Apps já está disponível?">
+    A loja está em fase de atualizações. Algumas funcionalidades podem estar indisponíveis ou sujeitas a mudanças enquanto a equipe trabalha nas melhorias.
+  </Accordion>
+
+  <Accordion title="Como cadastro produtos na loja?">
+    Quando a loja estiver totalmente operacional, você poderá cadastrar produtos na seção correspondente do painel. Acompanhe as novidades para saber quando a funcionalidade estará completa.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  A loja está passando por atualizações. Funcionalidades podem estar temporariamente indisponíveis.
+</Note>
+
+## Sorteios
+
+<AccordionGroup>
+  <Accordion title="Como crio um sorteio?">
+    Acesse a seção **Sorteios** no painel e clique em criar novo sorteio. Preencha as informações necessárias e publique. Cada sorteio recebe um ID único.
+  </Accordion>
+
+  <Accordion title="Como os participantes entram no sorteio?">
+    A forma de participação depende da configuração do sorteio. Consulte as opções disponíveis no painel ao criar ou editar um sorteio.
+  </Accordion>
+</AccordionGroup>
+
+## Tickets
+
+<AccordionGroup>
+  <Accordion title="Como entro em contato com o suporte?">
+    Todo o atendimento é feito pela **dashboard**, não pelo Discord. Acesse a seção **Tickets** no painel, clique em **Novo Ticket** e descreva seu problema.
+  </Accordion>
+
+  <Accordion title="O suporte responde pelo Discord?">
+    Não. Atendimentos não são realizados pelo Discord. Sempre use a seção **Tickets** dentro do painel da Sync Apps para abrir chamados e receber respostas.
+  </Accordion>
+</AccordionGroup>
 
 ## Saques
 
 <AccordionGroup>
-  <Accordion title="Como solicito um saque?">
-    Acesse **Saques → Novo Saque** no painel. Informe o valor desejado e selecione (ou cadastre) a chave PIX de destino. Confirme a operação e o saque será processado.
-
-    <Warning>
-      Saques são irreversíveis. Verifique a chave PIX de destino com atenção antes de confirmar.
-    </Warning>
+  <Accordion title="Como faço um saque?">
+    Acesse a seção **Saques** no painel, informe o valor, selecione o destino cadastrado e confirme. Saques são irreversíveis, então revise os dados antes de confirmar.
   </Accordion>
 
-  <Accordion title="Qual o prazo para o dinheiro cair na minha conta?">
-    Os saques são processados instantaneamente via PIX, 24 horas por dia, 7 dias por semana. Em situações de alta demanda ou manutenção programada, pode haver um atraso de até 30 minutos.
-  </Accordion>
-
-  <Accordion title="Existe valor mínimo ou máximo para saque?">
-    O valor mínimo de saque é **R\$ 10,00**. Não há limite máximo fixo, mas saques acima de determinados valores podem acionar revisão manual por segurança. Consulte o suporte para limites personalizados em contas com alto volume.
-  </Accordion>
-
-  <Accordion title="Quais tipos de chave PIX posso usar para saque?">
-    Você pode sacar para qualquer chave PIX válida:
-
-    - **CPF** (formato: 000.000.000-00 ou apenas números)
-    - **CNPJ** (formato: 00.000.000/0000-00 ou apenas números)
-    - **E-mail** (ex: [nome@email.com](mailto:nome@email.com))
-    - **Celular** (ex: \+5511999999999)
-    - **Chave aleatória (EVP)** (formato UUID)
-  </Accordion>
-
-  <Accordion title="Posso salvar chaves PIX favoritas para saques futuros?">
-    Sim. Acesse **Configurações → Chaves PIX** para cadastrar e nomear suas chaves favoritas. Elas ficam disponíveis no momento do saque para agilizar a operação.
-  </Accordion>
-
-  <Accordion title="O saque falhou. O que acontece com o meu saldo?">
-    Se o saque falhar (chave PIX inválida, conta bloqueada na instituição de destino, etc.), o valor é devolvido integralmente ao seu saldo disponível em até 5 minutos. Você receberá uma notificação e poderá tentar novamente com outra chave.
-  </Accordion>
-
-  <Accordion title="Existe alguma taxa para saques?">
-    As taxas dependem do plano da sua conta. Consulte a seção **Configurações → Plano** no painel ou fale com o suporte para detalhes sobre taxas aplicadas à sua conta.
+  <Accordion title="O que acontece se o saque falhar?">
+    Se a solicitação não for concluída com sucesso, o valor é **devolvido automaticamente** ao seu saldo na Sync Apps.
   </Accordion>
 </AccordionGroup>
-
----
-
-## API Keys
-
-<AccordionGroup>
-  <Accordion title="Como gero uma API Key?">
-    Acesse **Configurações → API Keys → Nova Chave** no painel. Dê um nome descritivo à chave (ex: "Produção - Loja Principal") e clique em **Gerar**. A chave é exibida uma única vez — copie e armazene em um local seguro imediatamente.
-
-    <Warning>
-      A API Key completa não é exibida novamente após fechar o modal. Se perdê-la, será necessário revogar e criar uma nova.
-    </Warning>
-  </Accordion>
-
-  <Accordion title="Posso ter múltiplas API Keys?">
-    Sim. É recomendável criar uma chave por ambiente ou integração (ex: uma para produção, outra para testes, outra por parceiro). Isso facilita a revogação seletiva em caso de comprometimento.
-  </Accordion>
-
-  <Accordion title="Como revogo uma API Key?">
-    Acesse **Configurações → API Keys**, localize a chave desejada e clique em **Revogar**. A chave é invalidada imediatamente. Qualquer requisição que use essa chave receberá erro `401 Unauthorized`.
-  </Accordion>
-
-  <Accordion title="Minha API Key foi exposta. O que fazer?">
-    Revogue a chave comprometida imediatamente em **Configurações → API Keys**. Em seguida, gere uma nova chave e atualize todas as integrações. Se suspeitar de uso indevido, entre em contato com o suporte.
-  </Accordion>
-
-  <Accordion title="As API Keys expiram automaticamente?">
-    Por padrão, as API Keys não expiram. Para maior segurança, recomendamos rotacionar as chaves periodicamente (a cada 90 dias é uma boa prática). A rotação pode ser feita sem interrupção: crie a nova chave, atualize as integrações e então revogue a antiga.
-  </Accordion>
-</AccordionGroup>
-
----
 
 ## Segurança
 
 <AccordionGroup>
-  <Accordion title="Como ativo a autenticação em dois fatores (2FA)?">
-    Acesse **Configurações → Segurança → Autenticação em Dois Fatores**. Clique em **Ativar 2FA** e escaneie o QR Code com um autenticador (Google Authenticator, Authy, etc.). Insira o código gerado para confirmar a ativação.
-
-    <Tip>
-      Guarde os códigos de recuperação exibidos durante a configuração. Eles são a única forma de acessar sua conta caso perca acesso ao autenticador.
-    </Tip>
+  <Accordion title="A Sync Apps pede minha senha?">
+    **Nunca.** A Sync Apps não solicita senha, código de acesso ou dados bancários por mensagem, e-mail ou Discord. Desconfie de qualquer comunicação que peça essas informações.
   </Accordion>
 
-  <Accordion title="Perdi o acesso ao meu autenticador. Como recupero o acesso?">
-    Use um dos códigos de recuperação gerados na ativação do 2FA. Se não os tiver, entre em contato com o suporte via Telegram [@syncapps](https://t.me/syncapps) para verificação de identidade e redefinição do 2FA.
-  </Accordion>
-
-  <Accordion title="Como vejo e encerro sessões ativas?">
-    Acesse **Configurações → Segurança → Sessões Ativas**. Você verá todos os dispositivos e navegadores com sessão aberta, incluindo IP, localização aproximada e data do último acesso. Clique em **Encerrar** para deslogar qualquer sessão suspeita.
-  </Accordion>
-
-  <Accordion title="Recebi um alerta de acesso suspeito. O que fazer?">
-    Se você não reconhece o acesso, encerre imediatamente todas as sessões em **Configurações → Segurança → Encerrar Todas as Sessões**, altere sua senha e revogue suas API Keys. Em seguida, contate o suporte para investigação.
-  </Accordion>
-
-  <Accordion title="A Sync Apps pede minha senha ou API Key por mensagem?">
-    Nunca. A Sync Apps jamais solicita sua senha, API Key ou código 2FA por e-mail, Telegram ou qualquer mensagem. Desconfie de qualquer contato que peça essas informações — trata-se de tentativa de phishing.
-  </Accordion>
-
-  <Accordion title="Como a Sync Apps protege meus dados?">
-    Todos os dados são transmitidos via HTTPS/TLS 1.3. As API Keys são armazenadas com hash (não é possível recuperar o valor original). As transações passam por sistema antifraude em tempo real. Para mais detalhes, consulte a página de [Segurança](/concepts/seguranca).
+  <Accordion title="Como protejo minha conta?">
+    Ative o **2FA no Discord**, não compartilhe o acesso ao painel e encerre sessões ativas em dispositivos desconhecidos pela seção **Configurações \> Segurança**.
   </Accordion>
 </AccordionGroup>
 
----
+## Ainda precisa de ajuda?
 
-## Suporte
-
-<AccordionGroup>
-  <Accordion title="Como entro em contato com o suporte?">
-    O canal principal de suporte é o Telegram: [@syncapps](https://t.me/syncapps). Para questões técnicas urgentes relacionadas à API, você também pode abrir um chamado diretamente pelo painel em **Ajuda → Abrir Chamado**.
-  </Accordion>
-
-  <Accordion title="Qual o tempo de resposta do suporte?">
-    O suporte via Telegram responde em média em até 2 horas durante o horário comercial (9h–18h, horário de Brasília). Para incidentes críticos (plataforma fora do ar, transações não processadas), o atendimento é prioritário.
-  </Accordion>
-
-  <Accordion title="Onde vejo o status da plataforma?">
-    Acesse [status.syncapps.com](https://status.syncapps.com) para ver o status em tempo real de todos os serviços da Sync Apps, incluindo o histórico de incidentes e manutenções programadas.
-  </Accordion>
-
-  <Accordion title="Tem documentação ou suporte para desenvolvedores?">
-    Sim. A documentação completa da API está neste portal. Para dúvidas técnicas sobre integração, acesse a aba [Desenvolvedor](/api-reference/overview) ou entre em contato pelo Telegram informando que é desenvolvedor para atendimento especializado.
-  </Accordion>
-
-  <Accordion title="Como reporto uma vulnerabilidade de segurança?">
-    Envie um e-mail detalhado para [**seguranca@syncapps.com**](mailto:seguranca@syncapps.com) com a descrição da vulnerabilidade. Não divulgue publicamente antes de receber uma resposta da equipe de segurança. Vulnerabilidades confirmadas são reconhecidas no nosso programa de bug bounty.
-  </Accordion>
-</AccordionGroup>
+Se não encontrou a resposta que procura, entre em contato pelo Telegram: [t.me/syncapps](https://t.me/syncapps) ou abra um ticket na seção **Tickets** do painel.
