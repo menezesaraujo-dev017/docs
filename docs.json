@@ -21,20 +21,35 @@
               "index",
               "about-us"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "Usando o App",
+        "icon": "mobile",
+        "groups": [
           {
             "group": "Primeiros Passos",
             "pages": [
-              "quickstart",
-              "tutorials/api-key"
+              "app/overview",
+              "app/login"
             ]
           },
           {
-            "group": "Conceitos Essenciais",
+            "group": "Recursos",
             "pages": [
-              "concepts/como-funciona",
-              "concepts/seguranca",
-              "concepts/webhooks-intro"
+              "app/bots",
+              "app/loja",
+              "app/sorteios",
+              "app/tickets",
+              "app/pagamentos"
+            ]
+          },
+          {
+            "group": "Ajuda",
+            "pages": [
+              "app/ids",
+              "app/faq"
             ]
           }
         ]
@@ -67,65 +82,14 @@
             ]
           }
         ]
-      },
-      {
-        "tab": "Desenvolvedor",
-        "icon": "code",
-        "groups": [
-          {
-            "group": "Fundamentos",
-            "pages": [
-              "api-reference/overview",
-              "api-reference/autenticacao",
-              "api-reference/rate-limiting"
-            ]
-          },
-          {
-            "group": "Pagamentos PIX",
-            "pages": [
-              "api-reference/endpoint/payments/create",
-              "api-reference/endpoint/payments/get",
-              "api-reference/endpoint/payments/list"
-            ]
-          },
-          {
-            "group": "Saques e Transferências",
-            "pages": [
-              "api-reference/endpoint/withdraws/create",
-              "api-reference/endpoint/withdraws/get",
-              "api-reference/endpoint/withdraws/list",
-              "api-reference/endpoint/transfers/internal"
-            ]
-          },
-          {
-            "group": "Conta e Webhooks",
-            "pages": [
-              "api-reference/endpoint/user/balance",
-              "api-reference/endpoint/user/webhook"
-            ]
-          },
-          {
-            "group": "Referência",
-            "pages": [
-              "api-reference/erros",
-              "api-reference/ambientes",
-              "api-reference/changelog"
-            ]
-          }
-        ]
       }
     ],
     "global": {
       "anchors": [
         {
-          "anchor": "Dashboard",
-          "href": "https://syncpay.com.br/dashboard",
+          "anchor": "Acessar App",
+          "href": "https://app.syncapps.com.br",
           "icon": "rocket"
-        },
-        {
-          "anchor": "Status",
-          "href": "https://status.syncpay.com.br",
-          "icon": "signal"
         },
         {
           "anchor": "Portal de Parceiros",
@@ -148,21 +112,9 @@
     "links": [],
     "primary": {
       "type": "button",
-      "label": "Acessar Dashboard",
-      "href": "https://syncpay.com.br"
+      "label": "Acessar o App",
+      "href": "https://app.syncapps.com.br"
     }
-  },
-  "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
-    ]
   },
   "footer": {
     "socials": {}

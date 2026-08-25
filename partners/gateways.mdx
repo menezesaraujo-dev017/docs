@@ -54,7 +54,7 @@ Veja como criar uma cobranca PIX a partir do seu gateway usando diferentes lingu
 
 ```bash curl
 # Criar uma cobranca PIX de R$ 50,00
-curl -X POST https://api.syncpay.com.br/v1/payments \
+curl -X POST https://api.syncapps.com/v1/payments \
   -H "Content-Type: application/json" \
   -H "X-API-Key: sua_api_key" \
   -d '{
@@ -63,12 +63,12 @@ curl -X POST https://api.syncpay.com.br/v1/payments \
     "description": "Pedido #12345",
     "expires_in": 3600,
     "merchant_id": "merchant_abc123",
-    "callback_url": "https://seugateway.com.br/webhooks/syncpay"
+    "callback_url": "https://seugateway.com.br/webhooks/syncapps"
   }'
 ```
 
 ```javascript JavaScript
-const response = await fetch('https://api.syncpay.com.br/v1/payments', {
+const response = await fetch('https://api.syncapps.com/v1/payments', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ const response = await fetch('https://api.syncpay.com.br/v1/payments', {
     description: 'Pedido #12345',
     expires_in: 3600,
     merchant_id: 'merchant_abc123',
-    callback_url: 'https://seugateway.com.br/webhooks/syncpay'
+    callback_url: 'https://seugateway.com.br/webhooks/syncapps'
   })
 });
 
@@ -93,7 +93,7 @@ console.log('Copia e Cola:', payment.pix_copy_paste);
 import requests
 
 payment = requests.post(
-    'https://api.syncpay.com.br/v1/payments',
+    'https://api.syncapps.com/v1/payments',
     headers={
         'Content-Type': 'application/json',
         'X-API-Key': 'sua_api_key'
@@ -104,7 +104,7 @@ payment = requests.post(
         'description': 'Pedido #12345',
         'expires_in': 3600,
         'merchant_id': 'merchant_abc123',
-        'callback_url': 'https://seugateway.com.br/webhooks/syncpay'
+        'callback_url': 'https://seugateway.com.br/webhooks/syncapps'
     }
 ).json()
 
@@ -129,7 +129,7 @@ A resposta da API contem todos os dados necessarios para apresentar a cobranca a
   "pix_copy_paste": "00020126580014BR.GOV.BCB.PIX0136...",
   "expires_at": "2024-01-15T14:30:00Z",
   "created_at": "2024-01-15T13:30:00Z",
-  "callback_url": "https://seugateway.com.br/webhooks/syncpay",
+  "callback_url": "https://seugateway.com.br/webhooks/syncapps",
   "merchant_id": "merchant_abc123"
 }
 ```

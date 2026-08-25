@@ -1,0 +1,181 @@
+---
+title: "Perguntas Frequentes sobre o App Sync Apps"
+sidebarTitle: "FAQ do App"
+description: "Tire todas as suas dúvidas sobre o app.syncapps.com.br: bots, lojas, sorteios, pagamentos, IDs, tickets e muito mais."
+---
+
+O app da Sync Apps está disponível em [app.syncapps.com.br](https://app.syncapps.com.br) e reúne todas as ferramentas para gerenciar bots, lojas, sorteios, pagamentos e sua conta em um único lugar. Esta página responde as dúvidas mais comuns dos usuários.
+
+<Info>
+  O atendimento e os tickets de suporte são feitos exclusivamente pela Dashboard em [app.syncapps.com.br](https://app.syncapps.com.br). Não realizamos atendimentos pelo Discord.
+</Info>
+
+## Conta e Acesso
+
+<AccordionGroup>
+  <Accordion title="Como acesso o app da Sync Apps?">
+    Acesse [app.syncapps.com.br](https://app.syncapps.com.br) pelo navegador. Faça login com seu e-mail e senha cadastrados. Caso ainda não tenha conta, clique em **Criar Conta** e siga o processo de cadastro.
+  </Accordion>
+
+  <Accordion title="Esqueci minha senha. Como recupero?">
+    Na tela de login, clique em **Esqueci minha senha**. Informe o e-mail da sua conta e você receberá um link de redefinição por e-mail. O link expira em 30 minutos.
+  </Accordion>
+
+  <Accordion title="Como abro um ticket de suporte?">
+    Todo o suporte é feito pela Dashboard. Acesse [app.syncapps.com.br](https://app.syncapps.com.br), vá até a seção de **Suporte** ou **Tickets** e abra um novo atendimento descrevendo o problema. **Não realizamos atendimentos pelo Discord.**
+  </Accordion>
+</AccordionGroup>
+
+## IDs e Identificadores
+
+Cada recurso dentro da Sync Apps possui um ID único. Esse identificador é gerado automaticamente e serve para localizar e referenciar qualquer objeto no sistema, como bots, pagamentos, sorteios, lojas e backups.
+
+<Note>
+  Exemplo de ID: `6a7504d0828228c7b19af029`. IDs seguem o formato hexadecimal de 24 caracteres (padrão MongoDB ObjectId).
+</Note>
+
+<AccordionGroup>
+  <Accordion title="O que é o ID do bot e para que serve?">
+    O ID do bot é um identificador único que representa aquele bot específico dentro da plataforma. Ele é usado para:
+
+    - Localizar o bot em chamadas de API
+    - Referenciar o bot em configurações de webhook e pagamento
+    - Identificar o bot ao abrir um ticket de suporte
+    - Associar eventos (pagamentos, sorteios, etc.) ao bot correto
+
+    Você encontra o ID do bot na Dashboard, na página de detalhes do bot. Exemplo: `6a7504d0828228c7b19af029`.
+  </Accordion>
+
+  <Accordion title="Onde encontro o ID de um pagamento?">
+    O ID do pagamento é retornado na resposta da API ao criar um pagamento e também fica disponível na seção **Pagamentos** da Dashboard. Ele permite rastrear o status, consultar o comprovante e associar o pagamento ao pedido correspondente no seu sistema.
+  </Accordion>
+
+  <Accordion title="Cada recurso tem seu próprio ID?">
+    Sim. Todos os recursos da plataforma possuem IDs individuais e independentes:
+
+    | Recurso | ID Exemplo |
+    | --- | --- |
+    | Bot | `6a7504d0828228c7b19af029` |
+    | Pagamento | `64f3a1b2c0912d3e4f5a6b7c` |
+    | Sorteio | `63e2f0a1b8723c4d5e6f7a8b` |
+    | Loja | `62d1e9f0a7612b3c4d5e6f7a` |
+    | Backup | `61c0d8e9f6501a2b3c4d5e6f` |
+    | Ticket | `60b9c7d8e5400f1a2b3c4d5e` |
+
+    Use sempre o ID correto do recurso ao entrar em contato com o suporte ou ao fazer chamadas de API para evitar confusões.
+  </Accordion>
+</AccordionGroup>
+
+## Bots
+
+<AccordionGroup>
+  <Accordion title="Como adiciono um bot na plataforma?">
+    Na Dashboard, acesse a seção **Bots** e clique em **Adicionar Bot**. Você precisará informar o token do bot (gerado no BotFather do Telegram) e configurar as permissões necessárias. Após salvar, o bot recebe um ID único na plataforma.
+  </Accordion>
+
+  <Accordion title="Como localizo um bot específico?">
+    Use o ID do bot para localizá-lo. Na Dashboard, você pode pesquisar pelo ID ou pelo nome do bot na listagem. Em chamadas de API, passe o ID do bot como parâmetro para operar sobre aquele bot específico.
+  </Accordion>
+
+  <Accordion title="O que faço se meu bot parar de responder?">
+    1. Verifique se o token do bot ainda é válido no BotFather
+    2. Acesse a Dashboard e confira o status do bot
+    3. Verifique se há webhooks configurados corretamente
+    4. Se o problema persistir, abra um **ticket de suporte** pela Dashboard informando o ID do bot
+  </Accordion>
+</AccordionGroup>
+
+## Lojas
+
+<AccordionGroup>
+  <Accordion title="Como funciona o sistema de lojas?">
+    O sistema de lojas permite que você configure uma vitrine de produtos ou serviços integrada ao bot. Os clientes podem navegar pelos itens e realizar o pagamento diretamente pelo Telegram, com confirmação automática via PIX.
+
+    <Warning>
+      O sistema de lojas está atualmente em fase de atualizações. Algumas funcionalidades podem estar em desenvolvimento ou com comportamento temporariamente diferente do esperado. Acompanhe as novidades pelo changelog da plataforma.
+    </Warning>
+  </Accordion>
+
+  <Accordion title="Posso ter mais de uma loja?">
+    Sim. Cada loja possui seu próprio ID e pode estar vinculada a um bot diferente. Gerencie todas as suas lojas na seção **Lojas** da Dashboard.
+  </Accordion>
+
+  <Accordion title="O que acontece com minha loja durante as atualizações?">
+    Durante as atualizações do sistema de lojas, as lojas existentes continuam operando normalmente. Novas funcionalidades são adicionadas de forma gradual. Caso note algum comportamento inesperado, abra um ticket de suporte informando o ID da loja afetada.
+  </Accordion>
+</AccordionGroup>
+
+## Sorteios
+
+<AccordionGroup>
+  <Accordion title="Como crio um sorteio?">
+    Na Dashboard, acesse a seção **Sorteios** e clique em **Novo Sorteio**. Configure o título, as condições de participação, a data do sorteio e o prêmio. Cada sorteio criado recebe um ID único para rastreamento.
+  </Accordion>
+
+  <Accordion title="Como associo um pagamento a um sorteio?">
+    Ao criar o sorteio, você pode definir que a participação exige um pagamento PIX de valor específico. O sistema vincula automaticamente o pagamento confirmado à entrada do participante no sorteio, usando o ID do pagamento e o ID do sorteio para manter o histórico.
+  </Accordion>
+
+  <Accordion title="Posso cancelar ou editar um sorteio após criá-lo?">
+    Sorteios podem ser editados antes de serem publicados. Após publicação, apenas o cancelamento completo é possível. Em caso de dúvidas ou problemas, use o ID do sorteio ao abrir um ticket de suporte.
+  </Accordion>
+</AccordionGroup>
+
+## Pagamentos e Backup
+
+<AccordionGroup>
+  <Accordion title="Como funciona o sistema de pagamentos no app?">
+    Os pagamentos são processados via PIX e confirmados em tempo real. Cada transação gera um ID único de pagamento visível na seção **Pagamentos** da Dashboard. Você pode filtrar por status (pendente, pago, expirado), data e valor.
+  </Accordion>
+
+  <Accordion title="O que é o Backup de pagamentos?">
+    O sistema de backup registra um histórico completo de todas as transações, incluindo tentativas, confirmações e cancelamentos. Cada registro de backup tem seu próprio ID e pode ser consultado na Dashboard para fins de auditoria, relatório ou resolução de disputas.
+  </Accordion>
+
+  <Accordion title="Como consulto um pagamento específico?">
+    Na Dashboard, acesse **Pagamentos** e use o ID do pagamento na busca. Você também pode filtrar por período, status ou valor. Via API, use o endpoint `GET /v1/payments/{id}` passando o ID do pagamento.
+  </Accordion>
+
+  <Accordion title="Um pagamento sumiu. O que faço?">
+    1. Verifique o histórico de backup na Dashboard
+    2. Use o ID do pagamento (se disponível) para localizar o registro
+    3. Confira se o pagamento foi feito para a chave PIX correta
+    4. Abra um **ticket de suporte** pela Dashboard informando o ID do pagamento e o comprovante do PIX
+  </Accordion>
+</AccordionGroup>
+
+## Webhooks e Integrações
+
+<AccordionGroup>
+  <Accordion title="Como configuro webhooks para meu bot?">
+    Na Dashboard, acesse as configurações do bot e adicione a URL de webhook. Você pode configurar webhooks para eventos de pagamento, novos participantes em sorteios e atualizações de pedidos da loja. Via API, use o endpoint `POST /v1/webhook`.
+  </Accordion>
+
+  <Accordion title="Como sei se meu webhook está funcionando?">
+    Na Dashboard, a seção de webhooks mostra o histórico de entregas com status de cada envio (sucesso, falha, retry). Você pode reenviar manualmente eventos com falha. Se o problema persistir, abra um ticket informando o ID do bot e a URL do webhook.
+  </Accordion>
+</AccordionGroup>
+
+## Suporte
+
+<AccordionGroup>
+  <Accordion title="Como entro em contato com o suporte?">
+    O suporte é feito exclusivamente pela Dashboard em [app.syncapps.com.br](https://app.syncapps.com.br). Acesse a seção de **Tickets**, abra um novo atendimento e descreva o problema com o máximo de detalhes possível, incluindo os IDs dos recursos afetados.
+
+    **Não atendemos pelo Discord.**
+  </Accordion>
+
+  <Accordion title="Quais informações devo incluir ao abrir um ticket?">
+    Para agilizar o atendimento, inclua:
+
+    - **ID do recurso afetado** (bot, pagamento, sorteio, loja, etc.)
+    - Descrição detalhada do problema
+    - Prints ou evidências (se aplicável)
+    - Data e horário em que o problema ocorreu
+    - O que você já tentou fazer para resolver
+  </Accordion>
+
+  <Accordion title="Qual o prazo de resposta do suporte?">
+    O suporte responde os tickets pela Dashboard. O prazo varia de acordo com a complexidade do caso e o volume de atendimentos. Problemas críticos relacionados a pagamentos têm prioridade no atendimento.
+  </Accordion>
+</AccordionGroup>

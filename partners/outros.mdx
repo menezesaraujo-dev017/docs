@@ -111,7 +111,7 @@ import os
 
 app = Flask(__name__)
 SYNC_API_KEY = os.environ.get('SYNC_API_KEY')
-SYNC_BASE_URL = 'https://api.syncpay.com.br'
+SYNC_BASE_URL = 'https://api.syncapps.com'
 
 def create_pix_payment(amount_cents, description, customer, callback_url, metadata):
     """Cria uma cobranca PIX na Sync Apps."""
@@ -135,8 +135,8 @@ def create_pix_payment(amount_cents, description, customer, callback_url, metada
     )
     return response.json()
 
-@app.route('/webhooks/syncpay', methods=['POST'])
-def handle_syncpay_webhook():
+@app.route('/webhooks/syncapps', methods=['POST'])
+def handle_syncapps_webhook():
     """Processa webhooks de confirmacao de pagamento."""
     payload = request.get_json()
     
@@ -173,7 +173,7 @@ const app = express();
 app.use(express.json());
 
 const SYNC_API_KEY = process.env.SYNC_API_KEY;
-const SYNC_BASE_URL = 'https://api.syncpay.com.br';
+const SYNC_BASE_URL = 'https://api.syncapps.com';
 
 // Criar cobranca PIX
 async function createPixPayment(amount, description, customer, callbackUrl, metadata) {
@@ -199,7 +199,7 @@ async function createPixPayment(amount, description, customer, callbackUrl, meta
 }
 
 // Webhook handler
-app.post('/webhooks/syncpay', (req, res) => {
+app.post('/webhooks/syncapps', (req, res) => {
   const payload = req.body;
   
   if (payload.event !== 'payment.confirmed') {

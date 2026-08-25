@@ -31,7 +31,7 @@ Parceiros da categoria Lojas Virtuais desfrutam de beneficios pensados especific
 
 Para se qualificar como parceiro loja virtual, sua plataforma deve atender aos seguintes criterios:
 
-- **Capacidade de integracao via API**: sua plataforma deve conseguir fazer requisicoes HTTPS para `https://api.syncpay.com.br` e processar respostas JSON
+- **Capacidade de integracao via API**: sua plataforma deve conseguir fazer requisicoes HTTPS para `https://api.syncapps.com` e processar respostas JSON
 - **Webhook endpoint**: voce precisa expor um endpoint HTTPS publico para receber notificacoes de mudanca de status de pagamento
 - **Suporte a HTTPS/TLS 1.2**: todas as comunicacoes entre sua plataforma e a Sync Apps devem usar criptografia moderna
 - **Documentacao ou plugin publico**: para plataformas open-source, e recomendado ter um plugin ou extensao documentada. Para SaaS, uma pagina de ajuda explicando a integracao e suficiente
@@ -61,7 +61,7 @@ Veja como criar um pagamento PIX a partir do checkout de uma loja virtual:
 
 ```bash curl
 # Criar cobranca PIX para um pedido de R$ 150,00
-curl -X POST https://api.syncpay.com.br/v1/payments \
+curl -X POST https://api.syncapps.com/v1/payments \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer sua_api_key" \
   -d '{
@@ -75,12 +75,12 @@ curl -X POST https://api.syncpay.com.br/v1/payments \
       "email": "maria@email.com",
       "tax_id": "123.456.789-00"
     },
-    "callback_url": "https://sualoja.com.br/webhooks/syncpay"
+    "callback_url": "https://sualoja.com.br/webhooks/syncapps"
   }'
 ```
 
 ```javascript JavaScript (Node.js)
-const payment = await fetch('https://api.syncpay.com.br/v1/payments', {
+const payment = await fetch('https://api.syncapps.com/v1/payments', {
   method: 'POST',
   headers: {
     'Content-Type': 'application/json',
@@ -97,7 +97,7 @@ const payment = await fetch('https://api.syncpay.com.br/v1/payments', {
       email: 'maria@email.com',
       tax_id: '123.456.789-00'
     },
-    callback_url: 'https://sualoja.com.br/webhooks/syncpay'
+    callback_url: 'https://sualoja.com.br/webhooks/syncapps'
   })
 }).then(r => r.json());
 
