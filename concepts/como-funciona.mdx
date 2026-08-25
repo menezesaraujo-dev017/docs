@@ -1,0 +1,140 @@
+---
+title: "Como Funciona a Sync Apps"
+sidebarTitle: "Como Funciona"
+description: "Entenda o fluxo completo de pagamentos PIX na Sync Apps: da criação do QR Code à confirmação via webhook, passo a passo."
+---
+
+A Sync Apps é a plataforma de pagamentos que conecta seu negócio ao ecossistema PIX de forma simples, rápida e segura. Esta página explica a arquitetura geral da plataforma, como o dinheiro viaja entre contas e quais são os tempos de resposta de cada etapa. Seja você um desenvolvedor integrando pela primeira vez ou um gestor de produto validando a solução, aqui você tira todas as suas dúvidas.
+
+## Fluxo Completo de um Pagamento
+
+Quando um cliente final paga via PIX, diversos sistemas conversam em frações de segundos. Abaixo, o passo a passo detalhado.
+
+<Steps>
+  <Step title="Sua aplicação cria o pagamento">
+    Você faz uma requisição `POST /v2/payments` para a API da Sync Apps informando o valor, descrição, expiração e o identificador interno do pedido.
+  </Step>
+  <Step title="A plataforma gera o QR Code PIX">
+    O nosso gateway de pagamentos processa a solicitação e devolve um **payload JSON** contendo o PIX Copia e Cola, o QR Code em base64 e o ID único do pagamento.
+  </Step>
+  <Step title="Seu cliente final visualiza o QR Code">
+    Você renderiza o QR Code na tela do celular do cliente ou envia o PIX Copia e Cola por WhatsApp, e-mail ou chatbot. A escolha é sua!
+  </Step>
+  <Step title="O cliente escaneia e paga via PIX">
+    Com o app do banco, o cliente escaneia o QR Code. O Banco Central processa a transação em segundos, movimentando os fundos do remetente para a conta destino.
+  </Step>
+  <Step title="A Sync Apps recebe a confirmação">
+    O PSP (Provedor de Serviço de Pagamento) confirma a liquidação junto ao Banco Central e repassa a notificação para a nossa plataforma em tempo real.
+  </Step>
+  <Step title="Você recebe o webhook de sucesso">
+    A Sync Apps dispara um webhook com o evento `payment.confirmed` para o endpoint configurado no seu dashboard. É hora de liberar o pedido ou creditar o saldo do usuário!
+  </Step>
+</Steps>
+
+## Arquitetura da Plataforma
+
+A Sync Apps é construída sobre três pilares principais que garantem estabilidade, velocidade e conformidade regulatória. Veja o que você, como desenvolvedor parceiro, precisa conhecer:
+
+<CardGroup cols={2}>
+  <Card title="API REST" icon="webhook">
+    Todos os serviços são expostos por uma API RESTful protegida por TLS 1.3. Os endpoints seguem o padrão OpenAPI 3.0 e retornam respostas em JSON. Autenticação via `X-API-Key` ou `Authorization: Bearer`.
+  </Card>
+
+  <Card title="Sistema de Webhooks" icon="bell">
+    Notificações assíncronas entregues via POST para URLs previamente cadastradas. Suporta retentativas automáticas com backoff exponencial e assinatura digital para validação de origem.
+  </Card>
+
+  <Card title="Gateway PIX" icon="wallet">
+    Integração direta com múltiplos PSPs certificados pelo Banco Central. Acelera a liquidação e reduz a dependência de um único provedor.
+  </Card>
+
+  <Card title="Camada Anti-MED" icon="shield">
+    Sistema inteligente de detecção e prevenção de fraudes, incluindo monitamento de padrões suspeitos, geolocalização de IPs e análise comportamental.
+  </Card>
+</CardGroup>
+
+<Info>
+  A Sync Apps não armazena dados de cartão de crédito ou débito. Trabalhamos exclusivamente com PIX, reduzindo o escopo de conformidade PCI-DSS e aumentando a segurança.
+</Info>
+
+### Diagrama Textual do Fluxo
+
+```text
+┌─────────────────┐      POST /v2/payments      ┌─────────────────┐
+│  Sua Aplicação  │ ───────────────────────────> │   Sync Apps    │
+│   (Seu Site)    │                              │     API        │
+└─────────────────┘                              └────────┬────────┘
+       ^                                                  │
+       │           PIX Copia e Cola + QR Code             │
+       │ <─────────────────────────────────────────────────┘
+       │
+       │    Cliente escaneia e paga via app do banco
+       │ <──────────────────────────────────────────────────
+       │                                                  │
+       │           Webhook payment.confirmed              │
+       │ <─────────────────────────────────────────────────
+       │
+  [Libera pedido / credita saldo]
+```
+
+## Tempos de Processamento
+
+Cada etapa do pagamento tem uma janela de tempo esperada. Use esta tabela para dimensionar SLAs e comunicar prazos para seus clientes finais.
+
+| Etapa | Tempo Esperado | Observação |
+| --- | --- | --- |
+| Geração do QR Code | 200 ms – 500 ms | Depende da carga no PSP |
+| Exibição ao cliente | Instantâneo | Base64 já está pronto |
+| Leitura do QR Code pelo app do banco | Variável | Dependente do cliente final |
+| Confirmação do Banco Central | 2 s – 15 s | Horário comercial é mais rápido |
+| Recebimento do webhook | \< 5 s após confirmação | Inclui retentativa se necessário |
+| Disponibilidade do saldo | Imediata | Após confirmação do webhook |
+
+<Tip>
+  Transações fora do horário comercial (20h – 06h) ou em finais de semana podem apresentar latência ligeiramente maior devido a processamento batch de alguns bancos.
+</Tip>
+
+## Notificações em Tempo Real
+
+O sistema de webhooks da Sync Apps foi projetado para eliminar a necessidade de polling. Assim que um evento acontece, nós te avisamos.
+
+### Principais eventos entregues
+
+- **`payment.confirmed`** — Pagamento aprovado e liquidado. Pode liberar o produto ou serviço.
+- **`payment.expired`** — O QR Code expirou antes do pagamento. Ofereça a opção de gerar um novo.
+- **`withdraw.completed`** — Saque processado com sucesso. Fundos enviados para a chave PIX.
+- **`withdraw.failed`** — Falha no saque. Verifique o saldo e a chave PIX informada.
+
+<Note>
+  Configure múltiplos endpoints de webhook no seu dashboard caso queira separar ambientes (produção vs. homologação) ou times distintos. Cada endpoint pode filtrar eventos específicos.
+</Note>
+
+## Como Garantimos a Segurança
+
+A segurança é prioridade máxima em cada camada da plataforma. Veja o que fazemos por padrão:
+
+<Steps>
+  <Step title="Comunicação criptografada">
+    Toda chamada à API e todo webhook é transmitido exclusivamente via HTTPS com TLS 1.3. Nenhuma informação sai em texto puro.
+  </Step>
+  <Step title="Autenticação por API Keys">
+    Cada conta de parceiro possui chaves únicas com escopos definidos. Você pode criar chaves de leitura, escrita ou ambas.
+  </Step>
+  <Step title="Assinatura de webhooks">
+    Cada payload de webhook inclui um cabeçalho de assinatura. Você pode validar criptograficamente que a mensagem veio mesmo da Sync Apps.
+  </Step>
+  <Step title="Proteção Anti-MED em tempo real">
+    Nossos modelos de detecção de fraude analisam cada transação em milissegundos, bloqueando padrões suspeitos antes que causem prejuízo.
+  </Step>
+  <Step title="Auditoria e logs">
+    Toda ação relevante na API é registrada com timestamp, IP de origem e identificador da requisição. Você pode consultar logs no dashboard.
+  </Step>
+</Steps>
+
+<Warning>
+  Nunca exponha sua API Key em código cliente (frontend, apps mobile). Sempre faça as chamadas à API Sync Apps a partir do seu servidor backend.
+</Warning>
+
+---
+
+Pronto para integrar? Explore a referência da API e veja exemplos práticos nos próximos guias!

@@ -1,0 +1,159 @@
+---
+title: "Códigos de Erro da API"
+sidebarTitle: "Erros"
+description: "Referência completa dos códigos de erro HTTP e mensagens de erro da API Sync Apps com descrições e o que fazer em cada caso."
+---
+
+A API da Sync Apps padroniza todas as respostas de erro com o campo `success: false` e um objeto `error` contendo o código, mensagem e detalhes da falha. Esta página documenta todos os códigos HTTP e erros específicos de negócio que você pode encontrar ao integrar a API, além de orientações práticas para resolver cada situação.
+
+## Códigos HTTP
+
+A API utiliza os códigos de status HTTP padrões para indicar o resultado da requisição:
+
+| Código | Significado | Quando Ocorre |
+| --- | --- | --- |
+| `200` | Sucesso | Requisição processada corretamente |
+| `201` | Criado | Recurso criado com sucesso (alguns endpoints) |
+| `400` | Requisição Inválida | Parâmetros ausentes, formato incorreto ou valores inválidos |
+| `401` | Não Autorizado | API key ausente, inválida ou expirada |
+| `403` | Proibido | Sem permissão para acessar o recurso solicitado |
+| `404` | Não Encontrado | Recurso não existe ou não pertence à conta |
+| `422` | Entidade Improcessável | Dados válidos semanticamente, mas violam regras de negócio |
+| `429` | Muitas Requisições | Limite de rate limiting atingido |
+| `500` | Erro Interno | Falha inesperada nos servidores da Sync Apps |
+
+## Erros HTTP Comuns
+
+### 400 Bad Request
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "BAD_REQUEST",
+    "message": "Requisição inválida",
+    "details": {
+      "field": "amount",
+      "issue": "O campo amount é obrigatório"
+    }
+  }
+}
+```
+
+**O que fazer:** Verifique se todos os campos obrigatórios foram enviados e se estão no formato correto. Valide tipos (string, integer, objeto) antes de enviar.
+
+### 401 Unauthorized
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "UNAUTHORIZED",
+    "message": "API key inválida ou não fornecida"
+  }
+}
+```
+
+**O que fazer:** Verifique se o header `X-API-Key` ou `Authorization: Bearer` está presente e correto. API keys revogadas também retornam este erro. Veja [Autenticação](/api-reference/autenticacao).
+
+### 403 Forbidden
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "FORBIDDEN",
+    "message": "Sua API key não tem permissão para acessar este recurso"
+  }
+}
+```
+
+**O que fazer:** Confirme se sua conta tem o plano necessário para o recurso. Entre em contato com o [suporte](https://t.me/syncapps) se precisar de acesso adicional.
+
+### 404 Not Found
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "PAYMENT_NOT_FOUND",
+    "message": "Pagamento não encontrado",
+    "details": {
+      "id": "pay_inexistente"
+    }
+  }
+}
+```
+
+**O que fazer:** Verifique se o ID do recurso está correto. IDs são compostos por prefixo (`pay_`, `withdraw_`) seguido de 21 caracteres alfanuméricos.
+
+### 422 Unprocessable Entity
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_AMOUNT",
+    "message": "O valor mínimo para pagamento PIX é R$ 1,00",
+    "details": {
+      "field": "amount",
+      "minimum": 100,
+      "provided": 50
+    }
+  }
+}
+```
+
+**O que fazer:** Corrija os dados enviados de acordo com a mensagem de erro. Campos específicos são apontados em `details.field`.
+
+### 429 Too Many Requests
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "RATE_LIMIT_EXCEEDED",
+    "message": "Limite de requisições excedido",
+    "details": {
+      "retry_after_seconds": 15,
+      "limit": 100,
+      "window": "60s"
+    }
+  }
+}
+```
+
+**O que fazer:** Aguarde o tempo indicado em `retry_after_seconds` e implemente backoff exponencial. Veja [Rate Limiting](/api-reference/rate-limiting).
+
+### 500 Internal Server Error
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "INTERNAL_ERROR",
+    "message": "Ocorreu um erro interno. Por favor, tente novamente mais tarde."
+  }
+}
+```
+
+**O que fazer:** Aguarde alguns segundos e tente novamente. Se o erro persistir, entre em contato com o suporte via [Telegram](https://t.me/syncapps).
+
+## Erros Específicos de Negócio
+
+| Código | Descrição | O que Fazer |
+| --- | --- | --- |
+| `INVALID_AMOUNT` | Valor inválido ou abaixo do mínimo | Envie um valor maior ou igual ao mínimo (R\$ 1,00 para pagamentos) |
+| `INSUFFICIENT_BALANCE` | Saldo insuficiente para o saque | Consulte o [saldo](/api-reference/endpoint/user/balance) antes de tentar o saque |
+| `INVALID_PIX_KEY` | Chave PIX inválida ou inexistente | Valide o formato da chave conforme o tipo (CPF, CNPJ, e-mail, etc.) |
+| `INVALID_PIX_KEY_TYPE` | Tipo de chave PIX não corresponde ao valor | Confirme que o tipo informado (`CPF`, `EMAIL`, etc.) corresponde ao formato da chave |
+| `PAYMENT_EXPIRED` | Pagamento já expirou | Não é possível pagar um PIX expirado. Crie um novo pagamento |
+| `PAYMENT_ALREADY_PAID` | Pagamento já foi confirmado | Evite duplicar entregas. Verifique o `status` antes de processar |
+| `WITHDRAW_FAILED` | Saque não pôde ser processado | Verifique saldo e chave PIX. Tente novamente ou contate suporte |
+| `EXTERNAL_ID_DUPLICATE` | Identificador externo já utilizado | Use um valor único para evitar duplicatas |
+| `WEBHOOK_INVALID_URL` | URL do webhook inválida ou inacessível | Use uma URL HTTPS acessível publicamente que responda com 200 |
+| `INVALID_EVENT` | Evento de webhook não suportado | Consulte a lista de eventos em [Webhooks](/api-reference/endpoint/user/webhook) |
+
+<Tip>
+  **Trate erros defensivamente.** Sempre verifique `success === false` antes de acessar `data`. Para erros 5xx, implemente retry com backoff. Para erros 4xx, corrija os dados e não repita a requisição idêntica.
+</Tip>

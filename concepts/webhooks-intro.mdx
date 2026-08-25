@@ -1,0 +1,284 @@
+---
+title: "Introdução aos Webhooks"
+sidebarTitle: "Webhooks"
+description: "Entenda o que são webhooks, como a Sync Apps os utiliza para notificações em tempo real e como configurar um endpoint de recebimento."
+---
+
+Webhooks são o coração das notificações em tempo real da Sync Apps. Em vez de sua aplicação ficar consultando a API repetidamente (polling) para saber se um pagamento foi confirmado, a Sync Apps avisa você automaticamente assim que o evento acontece. Esta página explica o conceito, os eventos disponíveis e como construir um endpoint robusto para receber notificações com segurança.
+
+## Como os Webhooks Funcionam
+
+Pense no webhook como uma carta que a Sync Apps envia para a sua aplicação sempre que algo importante acontece. Você não precisa bater na porta da plataforma: nós batemos na sua.
+
+### Fluxo simplificado
+
+<Steps>
+  <Step title="Você cadastra um endpoint">
+    No dashboard da Sync Apps, informe uma URL HTTPS do seu servidor que será responsável por receber as notificações.
+  </Step>
+  <Step title="Um evento acontece na plataforma">
+    Um pagamento é confirmado, um QR Code expira ou um saque é processado.
+  </Step>
+  <Step title="A Sync Apps envia um POST">
+    Montamos um payload JSON com todos os detalhes do evento e enviamos via HTTP POST para o endpoint cadastrado.
+  </Step>
+  <Step title="Seu servidor processa e responde">
+    Seu servidor recebe o payload, valida a autenticidade, processa a lógica de negócio e responde com HTTP 200.
+  </Step>
+</Steps>
+
+<Tip>
+  Webhooks eliminam o atraso do polling. Você recebe a notificação em segundos, em vez de minutos ou horas dependendo da frequência de consultas.
+</Tip>
+
+## Eventos Disponíveis
+
+A Sync Apps emite webhooks para os principais eventos do ciclo de vida de um pagamento ou saque. Veja cada um deles:
+
+### `payment.confirmed`
+
+Disparado quando um pagamento PIX é confirmado e liquidado pelo Banco Central.
+
+**Quando usar:** liberar acesso a um curso, confirmar um pedido no e-commerce, creditar saldo de um usuário.
+
+```json
+{
+  "event": "payment.confirmed",
+  "data": {
+    "id": "pay_abc123def456",
+    "amount": 150.00,
+    "currency": "BRL",
+    "status": "confirmed",
+    "pix_key": "cliente@email.com",
+    "payer_name": "João Silva",
+    "payer_document": "123.456.789-00",
+    "paid_at": "2025-08-15T14:32:10Z",
+    "external_reference": "PEDIDO-9988"
+  },
+  "timestamp": "2025-08-15T14:32:12Z"
+}
+```
+
+### `payment.expired`
+
+Disparado quando o prazo de expiração de um QR Code é atingido sem que o pagamento tenha sido efetuado.
+
+**Quando usar:** notificar o cliente para gerar um novo QR Code, cancelar um pedido pendente, liberar o estoque reservado.
+
+```json
+{
+  "event": "payment.expired",
+  "data": {
+    "id": "pay_abc123def456",
+    "amount": 150.00,
+    "status": "expired",
+    "expires_at": "2025-08-15T15:00:00Z",
+    "external_reference": "PEDIDO-9988"
+  },
+  "timestamp": "2025-08-15T15:00:01Z"
+}
+```
+
+### `withdraw.completed`
+
+Disparado quando um saque para uma chave PIX é processado com sucesso.
+
+**Quando usar:** notificar o usuário que o dinheiro saiu, atualizar o extrato, marcar a solicitação como finalizada.
+
+```json
+{
+  "event": "withdraw.completed",
+  "data": {
+    "id": "wd_xyz789abc012",
+    "amount": 500.00,
+    "fee": 2.50,
+    "net_amount": 497.50,
+    "pix_key": "11999998888",
+    "status": "completed",
+    "completed_at": "2025-08-15T10:15:30Z"
+  },
+  "timestamp": "2025-08-15T10:15:31Z"
+}
+```
+
+### `withdraw.failed`
+
+Disparado quando um saque não pode ser concluído, seja por saldo insuficiente, chave PIX inválida ou erro do PSP.
+
+**Quando usar:** notificar o usuário, permitir nova tentativa, registrar motivo da falha.
+
+```json
+{
+  "event": "withdraw.failed",
+  "data": {
+    "id": "wd_xyz789abc012",
+    "amount": 500.00,
+    "pix_key": "11999998888",
+    "status": "failed",
+    "failure_reason": "INSUFFICIENT_BALANCE",
+    "failed_at": "2025-08-15T10:15:30Z"
+  },
+  "timestamp": "2025-08-15T10:15:31Z"
+}
+```
+
+## Como Estruturar seu Endpoint
+
+Seu endpoint deve ser um servidor capaz de receber requisições HTTP POST com payload JSON. Abaixo, exemplos em Node.js e Python.
+
+### Exemplo em Node.js (Express)
+
+```javascript
+const express = require('express');
+const crypto = require('crypto');
+const app = express();
+
+app.use(express.json());
+
+const WEBHOOK_SECRET = process.env.SYNC_WEBHOOK_SECRET;
+
+function verifySignature(payload, signature) {
+  const hmac = crypto.createHmac('sha256', WEBHOOK_SECRET);
+  hmac.update(payload, 'utf8');
+  const digest = hmac.digest('hex');
+  return crypto.timingSafeEqual(
+    Buffer.from(signature, 'hex'),
+    Buffer.from(digest, 'hex')
+  );
+}
+
+app.post('/webhooks/sync', (req, res) => {
+  const signature = req.headers['x-sync-signature'];
+  const payload = JSON.stringify(req.body);
+
+  if (!verifySignature(payload, signature)) {
+    return res.status(401).send('Assinatura inválida');
+  }
+
+  const event = req.body.event;
+
+  switch (event) {
+    case 'payment.confirmed':
+      console.log('Pagamento confirmado:', req.body.data.id);
+      // Libere o pedido
+      break;
+    case 'payment.expired':
+      console.log('Pagamento expirado:', req.body.data.id);
+      // Notifique o cliente
+      break;
+    case 'withdraw.completed':
+      console.log('Saque concluído:', req.body.data.id);
+      break;
+    case 'withdraw.failed':
+      console.log('Saque falhou:', req.body.data.id);
+      break;
+  }
+
+  res.status(200).send('OK');
+});
+
+app.listen(3000, () => console.log('Servidor ouvindo na porta 3000'));
+```
+
+### Exemplo em Python (Flask)
+
+```python
+import os
+import hmac
+import hashlib
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+WEBHOOK_SECRET = os.environ['SYNC_WEBHOOK_SECRET']
+
+def verify_signature(payload, signature):
+    expected = hmac.new(
+        WEBHOOK_SECRET.encode(),
+        payload.encode(),
+        hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
+
+@app.route('/webhooks/sync', methods=['POST'])
+def handle_webhook():
+    signature = request.headers.get('X-Sync-Signature', '')
+    payload = request.get_data(as_text=True)
+
+    if not verify_signature(payload, signature):
+        return jsonify({'error': 'Assinatura inválida'}), 401
+
+    data = request.json
+    event = data.get('event')
+
+    if event == 'payment.confirmed':
+        print(f"Pagamento confirmado: {data['data']['id']}")
+        # Libere o pedido
+    elif event == 'payment.expired':
+        print(f"Pagamento expirado: {data['data']['id']}")
+    elif event == 'withdraw.completed':
+        print(f"Saque concluído: {data['data']['id']}")
+    elif event == 'withdraw.failed':
+        print(f"Saque falhou: {data['data']['id']}")
+
+    return jsonify({'status': 'OK'}), 200
+
+if __name__ == '__main__':
+    app.run(port=3000)
+```
+
+## Respondendo Corretamente
+
+Sua resposta ao webhook é fundamental para o funcionamento correto do sistema de retentativas.
+
+<Steps>
+  <Step title="Sempre retorne HTTP 200">
+    Assim que receber o payload, responda com status 200. Não espere processamentos longos para responder.
+  </Step>
+  <Step title="Processe de forma assíncrona">
+    Se sua lógica de negócio exige chamadas a bancos de dados ou serviços externos, coloque a tarefa em uma fila (SQS, RabbitMQ, Bull, etc.) e responda 200 imediatamente.
+  </Step>
+  <Step title="Evite timeout">
+    A Sync Apps aguarda até 10 segundos por uma resposta. Passado esse tempo, a requisição é considerada falha.
+  </Step>
+</Steps>
+
+<Warning>
+  Nunca processe webhooks de forma síncrona se sua operação envolver múltiplas chamadas externas. Timeouts acionam retentativas desnecessárias e podem causar duplicidade de processamento.
+</Warning>
+
+## Retentativas
+
+Se seu endpoint não responder com HTTP 200 ou estiver indisponível, a Sync Apps tentará entregar o webhook novamente.
+
+| Tentativa | Intervalo Aproximado |
+| --- | --- |
+| 1ª | Imediata |
+| 2ª | 5 minutos |
+| 3ª | 15 minutos |
+| 4ª | 1 hora |
+| 5ª | 3 horas |
+| 6ª | 6 horas |
+
+Após 6 tentativas sem sucesso, o evento é descartado e você pode consultá-lo manualmente via API ou dashboard.
+
+<Tip>
+  Implemente a lógica de idempotência no seu endpoint. O campo `id` dentro de `data` é único e pode ser usado para evitar processar o mesmo evento duas vezes.
+</Tip>
+
+## Validando a Autenticidade
+
+Para garantir que o webhook foi enviado pela Sync Apps e não por um atacante, verifique a assinatura digital inclusa no cabeçalho `X-Sync-Signature`.
+
+### Passo a passo
+
+1. Extraia o valor do cabeçalho `X-Sync-Signature`.
+2. Recompute o HMAC-SHA256 do payload JSON usando o **Webhook Secret** disponível no seu dashboard.
+3. Compare os dois valores usando comparação constante em tempo (timing-safe).
+
+<Info>
+  O Webhook Secret é diferente da API Key. Ele é gerado automaticamente quando você cria um endpoint de webhook e pode ser regenerado a qualquer momento no dashboard.
+</Info>
+
+---
+
+Com webhooks bem configurados, sua integração fica reativa, eficiente e pronta para escalar. Configure seu endpoint agora e nunca mais perca uma confirmação de pagamento!

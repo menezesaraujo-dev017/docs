@@ -1,0 +1,78 @@
+---
+title: "Changelog da API"
+sidebarTitle: "Changelog"
+description: "Histórico de alterações, melhorias e correções da API Sync Apps. Mantenha-se atualizado com as últimas novidades."
+---
+
+Acompanhe todas as atualizações, melhorias de performance, novos recursos e correções de bugs da API da Sync Apps. Recomendamos assinar notificações de changelog via [Telegram](https://t.me/syncapps) para receber alertas sempre que uma nova versão for lançada.
+
+## v1.4.0 — 15 de Janeiro de 2025
+
+**Novo**
+
+- Adicionado endpoint `POST /v1/transfers/internal` para transferências instantâneas entre contas Sync Apps, sem taxas e sem depender de horários bancários
+- Novo evento de webhook `balance.updated` disparado sempre que o saldo da conta é alterado (pagamentos confirmados, saques, transferências internas)
+- Suporte a `external_id` em saques (`POST /v1/withdraws`) para prevenção de duplicatas e rastreabilidade
+
+**Melhoria**
+
+- Performance de listagem de pagamentos (`GET /v1/payments`) otimizada em até 60% para contas com mais de 10.000 transações
+- Headers de rate limit (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`) agora incluídos em todas as respostas, mesmo em requisições bem-sucedidas
+- Melhoria na precisão do campo `paid_at` em webhooks de `payment.confirmed`, agora sincronizado com o horário do banco central
+
+**Correção**
+
+- Corrigido bug onde webhooks de `withdraw.failed` não incluíam o campo `error_details` em alguns cenários de timeout bancário
+- Ajustado comportamento de expiração de pagamentos para respeitar exatamente o valor de `expires_in` (anteriormente havia uma tolerância de até 30 segundos a mais)
+
+---
+
+## v1.3.2 — 8 de Janeiro de 2025
+
+**Melhoria**
+
+- Reduzido tempo médio de resposta do endpoint `GET /v1/user/balance` de 180ms para 45ms
+- Cache de saldo implementado com invalidação automática após eventos financeiros
+
+**Correção**
+
+- Corrigido erro `500 Internal Server Error` intermitente no endpoint `POST /v1/payments` ao enviar `metadata` com caracteres especiais (emojis e acentos)
+- Ajustada validação de chaves PIX do tipo `PHONE` para aceitar números com e sem o dígito 9 adicional (ex: `11987654321` e `1187654321`)
+
+---
+
+## v1.3.0 — 20 de Dezembro de 2024
+
+**Novo**
+
+- Lançado suporte a múltiplos webhooks por conta. Agora é possível configurar até 5 URLs de webhook com eventos diferentes
+- Adicionado parâmetro `callback_url` em `POST /v1/payments` para redirecionamento pós-pagamento em fluxos de checkout web
+- Novo campo `fee` nas respostas de saques (`GET /v1/withdraws/{id}` e `GET /v1/withdraws`) para transparência de custos
+
+**Melhoria**
+
+- Documentação de erro aprimorada: todos os endpoints agora retornam `details.field` indicando exatamente qual campo causou a validação falha
+- Aumentado o limite de `limit` em listagens de 50 para 100 itens por página
+
+**Correção**
+
+- Corrigido problema onde pagamentos com `expires_in` menor que 60 segundos retornavam QR code inválido
+- Resolvido bug de paginação onde `total_pages` retornava 1 a mais que o real em listagens com múltiplos filtros aplicados
+
+---
+
+## Como se Manter Atualizado
+
+<CardGroup cols={2}>
+  <Card title="Telegram" icon="telegram" href="https://t.me/syncapps">
+    Canal oficial com anúncios de novas versões e alertas de manutenção
+  </Card>
+
+  <Card title="Status" icon="signal" href="https://status.syncpay.com.br">
+    Página de status em tempo real com disponibilidade dos endpoints
+  </Card>
+</CardGroup>
+
+<Tip>
+  **Versionamento:** A API segue versionamento por URL (`/v1/`). Mudanças breaking são comunicadas com 30 dias de antecedência. Novos recursos são adicionados de forma backward-compatible.
+</Tip>

@@ -1,0 +1,402 @@
+---
+title: "Autenticação na API Sync Apps"
+sidebarTitle: "Autenticação"
+description: "Saiba como autenticar suas requisições na API Sync Apps usando API Keys via header X-API-Key ou Authorization Bearer."
+---
+
+A segurança da sua integração começa aqui. A API da Sync Apps exige autenticação em **todas** as requisições — não existem endpoints públicos ou anônimos. Cada chamada precisa incluir uma credencial válida que identifique sua conta e garanta que você tem permissão para acessar o recurso solicitado.
+
+Nesta página, você vai aprender:
+
+- Os **dois métodos de autenticação** que a API aceita
+- Como **obter sua API Key** de forma segura
+- Quais **erros de autenticação** podem aparecer e como resolvê-los
+- As **melhores práticas de segurança** para proteger suas credenciais
+- Exemplos de código em **várias linguagens** para você copiar e colar
+
+Vamos começar!
+
+## Métodos de Autenticação
+
+A Sync Apps aceita **dois headers** diferentes para enviar sua API Key. Ambos são igualmente válidos e seguros, então você pode escolher o que preferir — ou aquele que melhor se encaixa na configuração do seu framework HTTP favorito.
+
+<CodeGroup>
+
+```bash curl - X-API-Key (Recomendado)
+curl -X GET "https://api.syncpay.com.br/v1/user/balance" \
+  -H "X-API-Key: sua_api_key_aqui" \
+  -H "Content-Type: application/json"
+```
+
+```bash curl - Authorization Bearer
+curl -X GET "https://api.syncpay.com.br/v1/user/balance" \
+  -H "Authorization: Bearer sua_api_key_aqui" \
+  -H "Content-Type: application/json"
+```
+
+```javascript Node.js - X-API-Key
+const apiKey = process.env.SYNC_APPS_API_KEY;
+
+const response = await fetch('https://api.syncpay.com.br/v1/user/balance', {
+  method: 'GET',
+  headers: {
+    'X-API-Key': apiKey,
+    'Content-Type': 'application/json'
+  }
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+```javascript Node.js - Authorization Bearer
+const apiKey = process.env.SYNC_APPS_API_KEY;
+
+const response = await fetch('https://api.syncpay.com.br/v1/user/balance', {
+  method: 'GET',
+  headers: {
+    'Authorization': `Bearer ${apiKey}`,
+    'Content-Type': 'application/json'
+  }
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+```python Python - X-API-Key
+import os
+import requests
+
+api_key = os.environ.get('SYNC_APPS_API_KEY')
+
+response = requests.get(
+    'https://api.syncpay.com.br/v1/user/balance',
+    headers={
+        'X-API-Key': api_key,
+        'Content-Type': 'application/json'
+    }
+)
+
+data = response.json()
+print(data)
+```
+
+```python Python - Authorization Bearer
+import os
+import requests
+
+api_key = os.environ.get('SYNC_APPS_API_KEY')
+
+response = requests.get(
+    'https://api.syncpay.com.br/v1/user/balance',
+    headers={
+        'Authorization': f'Bearer {api_key}',
+        'Content-Type': 'application/json'
+    }
+)
+
+data = response.json()
+print(data)
+```
+
+```php PHP - X-API-Key
+<?php
+$apiKey = getenv('SYNC_APPS_API_KEY');
+
+$ch = curl_init('https://api.syncpay.com.br/v1/user/balance');
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'X-API-Key: ' . $apiKey,
+    'Content-Type: application/json'
+]);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+$response = curl_exec($ch);
+curl_close($ch);
+
+$data = json_decode($response, true);
+print_r($data);
+```
+
+</CodeGroup>
+
+<Info>
+  **Qual método escolher?** Ambos funcionam igualmente bem. O header `X-API-Key` é um pouco mais direto e evita a necessidade de concatenar strings no formato Bearer. O `Authorization: Bearer` segue o padrão OAuth 2.0, sendo mais familiar para quem já trabalha com tokens em outras APIs.
+</Info>
+
+### Requisitos do Header de Autenticação
+
+Independente do método escolhido, preste atenção nestas regras:
+
+- A API Key deve ser enviada em **todo** request, sem exceção
+- O valor da chave é **case-sensitive** (diferencia maiúsculas de minúsculas)
+- Não adicione espaços, quebras de linha ou caracteres extras à chave
+- A chave deve estar presente **antes** de qualquer lógica de negócio ser processada
+- Nunca envie a API Key como parâmetro de query string (`?api_key=...`) — isso é inseguro
+- Não compartilhe a mesma API Key entre múltiplas aplicações sem necessidade
+
+<Warning>
+  **Cuidado com a exposição da sua chave!** Quem possui sua API Key tem acesso completo à sua conta: pode criar cobranças, consultar saldo, solicitar saques e gerenciar webhooks. Trate sua API Key como uma senha forte.
+</Warning>
+
+## Como Obter sua API Key
+
+Para começar a fazer requisições autenticadas, você precisa gerar uma API Key no seu [Dashboard da Sync Apps](https://syncpay.com.br/dashboard). O processo é rápido e a chave é exibida apenas uma vez — por isso, guarde-a em um local seguro imediatamente.
+
+<Steps>
+  <Step title="Acesse o Dashboard">
+    Faça login no [Dashboard da Sync Apps](https://syncpay.com.br/dashboard) com suas credenciais de conta.
+  </Step>
+  <Step title="Vá até Configurações">
+    No menu lateral, navegue até **Configurações** e depois clique em **API Keys**.
+  </Step>
+  <Step title="Clique em Gerar Nova API Key">
+    Clique no botão verde **"Gerar Nova API Key"**. Será solicitada uma confirmação para sua segurança.
+  </Step>
+  <Step title="Copie e guarde em segurança">
+    A chave será exibida **apenas uma vez** na tela. Copie-a e armazene em um cofre digital, gerenciador de senhas ou variável de ambiente segura. Se perder a chave, você precisará revogá-la e gerar uma nova.
+  </Step>
+  <Step title="Teste no endpoint de saldo">
+    Use a chave recém-gerada para fazer uma requisição ao endpoint `GET /v1/user/balance`. Se receber o saldo corretamente, sua autenticação está funcionando perfeitamente!
+  </Step>
+</Steps>
+
+<Card title="Portal de Parceiros" icon="users" href="https://partners.syncapps.com.br">
+  Se você é um parceiro integrador, também pode gerenciar chaves de API no Portal de Parceiros para seus clientes.
+</Card>
+
+### Rotação e Revogação de API Keys
+
+É uma ótima prática de segurança **rotacionar** sua API Key periodicamente. A Sync Apps permite que você:
+
+- Crie múltiplas API Keys para diferentes ambientes (desenvolvimento, staging, produção)
+- Revogue uma chave comprometida ou não mais necessária
+- Monitore o uso de cada chave separadamente no dashboard
+
+Para revogar uma chave existente, acesse **Configurações \> API Keys** no dashboard, clique no menu ao lado da chave desejada e selecione **"Revogar"**. A revogação é **imediata** — qualquer request usando aquela chave começará a retornar `401 Unauthorized` imediatamente.
+
+## Erros de Autenticação
+
+Quando algo dá errado na autenticação, a API retorna respostas claras e acionáveis. Abaixo estão os dois códigos de status mais comuns neste cenário:
+
+### Tabela de Erros
+
+| Código HTTP | Significado | Causas Comuns | O que fazer |
+| --- | --- | --- | --- |
+| `401 Unauthorized` | Não autenticado | API Key ausente no header; chave expirada; chave revogada; typo na chave | Verifique se o header está presente e se o valor está correto; confirme se a chave ainda é válida no dashboard |
+| `403 Forbidden` | Sem permissão | API Key válida, mas a conta não tem acesso ao recurso; plano sem permissão para esta funcionalidade; IP bloqueado | Verifique as permissões da sua conta; entre em contato com o suporte se achar que deveria ter acesso |
+
+### Exemplo de Resposta 401
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "unauthorized",
+    "message": "API Key inválida ou ausente.",
+    "status_code": 401
+  }
+}
+```
+
+### Exemplo de Resposta 403
+
+```json
+{
+  "success": false,
+  "error": {
+    "code": "forbidden",
+    "message": "Você não tem permissão para acessar este recurso.",
+    "status_code": 403
+  }
+}
+```
+
+<Info>
+  **Diferença entre 401 e 403:** O código `401` significa "não sei quem você é" (autenticação falhou). O código `403` significa "eu sei quem você é, mas você não tem permissão" (autorização falhou). Esta distinção é fundamental para o diagnóstico correto.
+</Info>
+
+## Boas Práticas de Segurança
+
+Proteger sua API Key é proteger sua conta e o dinheiro dos seus clientes. Siga estas práticas recomendadas religiosamente:
+
+<AccordionGroup>
+  <Accordion title="1. Nunca exponha a API Key no frontend">
+    **Nunca** armazene sua API Key no código JavaScript do navegador, em apps mobile não compilados ou em repositórios públicos no GitHub. Qualquer pessoa com acesso ao código-fonte pode extrair a chave.
+
+    Armazene a chave **exclusivamente** no lado do servidor (Node.js, Python, PHP, Java, etc.). Seu frontend deve fazer requisições ao seu próprio backend, que por sua vez chama a API Sync Apps.
+  </Accordion>
+
+  <Accordion title="2. Use variáveis de ambiente">
+    Nunca faça hardcode da API Key diretamente no código-fonte. Sempre use variáveis de ambiente para carregar credenciais sensíveis.
+
+    ```text .env
+    SYNC_APPS_API_KEY=sync_live_abc123def456ghi789
+    SYNC_APPS_ENVIRONMENT=production
+    ```
+
+    ```javascript Node.js
+    const apiKey = process.env.SYNC_APPS_API_KEY;
+    ```
+
+    ```python Python
+    import os
+    api_key = os.environ.get('SYNC_APPS_API_KEY')
+    ```
+
+    ```bash Linux/Mac
+    export SYNC_APPS_API_KEY="sync_live_abc123def456ghi789"
+    ```
+  </Accordion>
+
+  <Accordion title="3. Separe ambientes com chaves diferentes">
+    Crie uma API Key exclusiva para cada ambiente:
+
+    - **Desenvolvimento** — para testar em sua máquina local
+    - **Staging/Homologação** — para validar antes do deploy
+    - **Produção** — para transações reais com dinheiro real
+
+    Assim, se uma chave de desenvolvimento vazar, sua produção permanece segura. Além disso, você pode revogar uma chave sem afetar os demais ambientes.
+  </Accordion>
+
+  <Accordion title="4. Monitore o uso da sua API Key">
+    Acesse o [Dashboard da Sync Apps](https://syncpay.com.br/dashboard) regularmente para verificar:
+
+    - Quantidade de requisições por chave
+    - IPs de origem das chamadas
+    - Horários de maior uso
+    - Tentativas de acesso não autorizado
+
+    Se detectar padrões suspeitos (requisições de IPs estranhos, horários incomuns), revogue a chave imediatamente e gere uma nova.
+  </Accordion>
+
+  <Accordion title="5. Revogue chaves antigas ou desnecessárias">
+    Periodicamente, faça uma "faxina" nas suas API Keys:
+
+    - Revogue chaves de projetos descontinuados
+    - Revogue chaves de funcionários que saíram da equipe
+    - Revogue chaves de ambientes temporários (testes, demos)
+
+    Quanto menos chaves ativas você tiver, menor a superfície de ataque.
+  </Accordion>
+
+  <Accordion title="6. Use HTTPS sempre">
+    A API Sync Apps aceita **apenas** requisições HTTPS. Mesmo assim, certifique-se de que sua aplicação está configurada para validar certificados SSL (não desative essa verificação em produção). Isso evita ataques man-in-the-middle que poderiam interceptar sua API Key durante a transmissão.
+  </Accordion>
+
+  <Accordion title="7. Limitar permissões por chave (quando disponível)">
+    Se sua conta suporta granularidade de permissões por API Key, crie chaves com acesso limitado ao mínimo necessário. Por exemplo:
+
+    - Uma chave **apenas para consulta** de saldo (somente leitura)
+    - Uma chave **apenas para criação** de cobranças
+    - Uma chave **com acesso total** apenas para o time financeiro
+  </Accordion>
+
+  <Accordion title="8. Implemente logs seguros">
+    Quando registrar logs de requisições, **nunca** inclua a API Key nos logs. Se precisar identificar a chave, use um hash, identificador interno ou os últimos 4 caracteres. Logs expostos são uma das formas mais comuns de vazamento de credenciais.
+
+    ```python Python - Exemplo seguro
+    import hashlib
+    
+    api_key = 'sync_live_abc123def456ghi789'
+    key_hash = hashlib.sha256(api_key.encode()).hexdigest()
+    print(f'Requisição feita com chave hash: {key_hash[:16]}...')
+    ```
+  </Accordion>
+</AccordionGroup>
+
+<Warning>
+  **Alerta de segurança:** Se você suspeitar que sua API Key foi comprometida (exposição acidental em um repositório público, vazamento em logs, acesso não autorizado ao servidor), **revogue a chave imediatamente** no dashboard e substitua-a por uma nova. Não espere — ações rápidas minimizam danos.
+</Warning>
+
+<Tip>
+  **Dica Pro:** Se você está construindo um SaaS multi-tenant, não reutilize sua própria API Key para processar pagamentos de todos os seus clientes. Considere usar o [Portal de Parceiros](https://partners.syncapps.com.br) para gerenciar contas filhas ou entre em contato com nosso suporte para discutir arquiteturas de integração seguras.
+</Tip>
+
+## Testando sua Autenticação
+
+Nada melhor que um teste real para confirmar que tudo está funcionando. O endpoint `GET /v1/user/balance` é perfeito para isso: ele é simples, rápido e não altera nenhum dado.
+
+<CodeGroup>
+
+```bash curl - X-API-Key
+curl -X GET "https://api.syncpay.com.br/v1/user/balance" \
+  -H "X-API-Key: sua_api_key_aqui"
+```
+
+```bash curl - Authorization Bearer
+curl -X GET "https://api.syncpay.com.br/v1/user/balance" \
+  -H "Authorization: Bearer sua_api_key_aqui"
+```
+
+```javascript Node.js
+const response = await fetch('https://api.syncpay.com.br/v1/user/balance', {
+  method: 'GET',
+  headers: {
+    'X-API-Key': process.env.SYNC_APPS_API_KEY
+  }
+});
+
+if (response.status === 200) {
+  const data = await response.json();
+  console.log('Autenticação OK! Saldo:', data.data.balance);
+} else if (response.status === 401) {
+  console.error('API Key inválida ou ausente.');
+} else {
+  console.error('Erro inesperado:', response.status);
+}
+```
+
+```python Python
+import os
+import requests
+
+response = requests.get(
+    'https://api.syncpay.com.br/v1/user/balance',
+    headers={'X-API-Key': os.environ.get('SYNC_APPS_API_KEY')}
+)
+
+if response.status_code == 200:
+    data = response.json()
+    print(f"Autenticação OK! Saldo: R$ {data['data']['balance']}")
+elif response.status_code == 401:
+    print("API Key inválida ou ausente.")
+else:
+    print(f"Erro inesperado: {response.status_code}")
+```
+
+</CodeGroup>
+
+### Resposta Esperada
+
+Se sua autenticação está correta, você receberá algo assim:
+
+```json
+{
+  "success": true,
+  "data": {
+    "balance": 1250.50,
+    "currency": "BRL",
+    "available": 1200.00,
+    "pending": 50.50
+  }
+}
+```
+
+Se receber um erro `401` ou `403`, revise os passos desta página e confirme que sua chave está ativa e corretamente digitada.
+
+---
+
+<CardGroup cols={2}>
+  <Card title="Visão Geral da API" icon="globe" href="/api-reference/overview">
+    Volte para a visão geral da API para entender a estrutura completa, códigos de status e versionamento.
+  </Card>
+
+  <Card title="Rate Limiting" icon="gauge" href="/api-reference/rate-limiting">
+    Aprenda sobre os limites de requisições e como implementar retry inteligente em sua integração.
+  </Card>
+</CardGroup>
+
+<Card title="Precisa de ajuda?" icon="message" href="https://t.me/syncapps">
+  Se você está tendo dificuldades com a autenticação, nosso time de suporte está disponível no Telegram para te ajudar em tempo real.
+</Card>

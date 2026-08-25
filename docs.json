@@ -1,12 +1,12 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "luma",
   "css": "/global.css",
-  "name": "Sync Pay Docs",
+  "name": "Sync Apps Docs",
   "colors": {
-    "primary": "#FF5C00",
-    "light": "#FF5C00",
-    "dark": "#FF5C00"
+    "primary": "#5865f1",
+    "light": "#7b86f5",
+    "dark": "#3d4be8"
   },
   "favicon": "/favicon.svg",
   "navigation": {
@@ -16,16 +16,54 @@
         "icon": "house",
         "groups": [
           {
-            "group": "Comece Aqui",
+            "group": "Bem-vindo",
             "pages": [
               "index",
               "about-us"
             ]
           },
           {
-            "group": "Guias e Tutoriais",
+            "group": "Primeiros Passos",
             "pages": [
+              "quickstart",
               "tutorials/api-key"
+            ]
+          },
+          {
+            "group": "Conceitos Essenciais",
+            "pages": [
+              "concepts/como-funciona",
+              "concepts/seguranca",
+              "concepts/webhooks-intro"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Parceiros",
+        "icon": "handshake",
+        "groups": [
+          {
+            "group": "Programa de Parceiros",
+            "pages": [
+              "partners/overview",
+              "partners/como-se-inscrever",
+              "partners/aprovacao-e-status"
+            ]
+          },
+          {
+            "group": "Tipos de Integração",
+            "pages": [
+              "partners/gateways",
+              "partners/lojas",
+              "partners/outros"
+            ]
+          },
+          {
+            "group": "Recursos para Parceiros",
+            "pages": [
+              "partners/faq",
+              "partners/boas-praticas"
             ]
           }
         ]
@@ -38,6 +76,7 @@
             "group": "Fundamentos",
             "pages": [
               "api-reference/overview",
+              "api-reference/autenticacao",
               "api-reference/rate-limiting"
             ]
           },
@@ -53,35 +92,24 @@
             "group": "Saques e Transferências",
             "pages": [
               "api-reference/endpoint/withdraws/create",
-              "api-reference/endpoint/withdraws/crypto",
               "api-reference/endpoint/withdraws/get",
               "api-reference/endpoint/withdraws/list",
               "api-reference/endpoint/transfers/internal"
             ]
           },
           {
-            "group": "Gestão de Conta",
+            "group": "Conta e Webhooks",
             "pages": [
               "api-reference/endpoint/user/balance",
               "api-reference/endpoint/user/webhook"
             ]
-          }
-        ]
-      },
-      {
-        "tab": "Ferramentas IA",
-        "icon": "microchip-ai",
-        "groups": [
+          },
           {
-            "group": "Inteligência Artificial",
+            "group": "Referência",
             "pages": [
-              "ai-tools/hub",
-              {
-                "group": "— Em Breve —",
-                "pages": [
-                  "sync-events"
-                ]
-              }
+              "api-reference/erros",
+              "api-reference/ambientes",
+              "api-reference/changelog"
             ]
           }
         ]
@@ -98,6 +126,16 @@
           "anchor": "Status",
           "href": "https://status.syncpay.com.br",
           "icon": "signal"
+        },
+        {
+          "anchor": "Portal de Parceiros",
+          "icon": "handshake",
+          "href": "https://partners.syncapps.com.br"
+        },
+        {
+          "anchor": "Suporte",
+          "icon": "telegram",
+          "href": "https://t.me/syncapps"
         }
       ]
     }

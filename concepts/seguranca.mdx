@@ -1,0 +1,130 @@
+---
+title: "Segurança na Sync Apps"
+sidebarTitle: "Segurança"
+description: "Conheça as camadas de segurança da Sync Apps: criptografia, autenticação, proteção Anti-MED e as melhores práticas para sua integração."
+---
+
+A Sync Apps leva a segurança a sério. Trabalhamos com dados financeiros de parceiros e clientes finais, por isso cada decisão de arquitetura considera a proteção da informação como requisito primário. Esta página detalha as camadas de segurança que envolvem a plataforma e como você pode reforçar ainda mais a proteção da sua integração.
+
+## Criptografia
+
+Toda comunicação entre sua aplicação e a Sync Apps é criptografada de ponta a ponta. Não oferecemos endpoints HTTP sem TLS.
+
+### TLS 1.3 em todas as conexões
+
+A API da Sync Apps exige HTTPS em todas as requisições. O certificado TLS é validado automaticamente, garantindo que nenhum intermediário possa interceptar ou alterar os dados em trânsito.
+
+<CardGroup cols={2}>
+  <Card title="TLS 1.3" icon="lock">
+    Protocolo mais recente de criptografia em trânsito. Oferece forward secrecy por padrão, protegendo dados passados mesmo em caso de vazamento futuro de chaves.
+  </Card>
+
+  <Card title="Certificados válidos" icon="file-check">
+    Certificados emitidos por autoridades confiáveis (CAs), com monitoramento contínuo de expiração e renovação automática.
+  </Card>
+</CardGroup>
+
+<Info>
+  Se sua aplicação cliente realiza validação rigorosa de certificados (certificate pinning), monitore possíveis renovações automáticas para evitar interrupções.
+</Info>
+
+## Autenticação e Autorização
+
+A API utiliza um modelo simples e poderoso de autenticação baseado em API Keys, com controle de escopo e revogação imediata.
+
+### Como funciona
+
+```http
+GET https://api.syncpay.com.br/v2/payments
+X-API-Key: sua_api_key_aqui
+```
+
+Ou, de forma equivalente:
+
+```http
+GET https://api.syncpay.com.br/v2/payments
+Authorization: Bearer sua_api_key_aqui
+```
+
+### Escopos disponíveis
+
+| Escopo | Permissões |
+| --- | --- |
+| `read` | Listar pagamentos, consultar saldo, visualizar saques |
+| `write` | Criar pagamentos, solicitar saques, configurar webhooks |
+| `admin` | Gerenciar API Keys, acessar logs, alterar configurações da conta |
+
+<Warning>
+  Nunca commitar chaves de API em repositórios públicos, nem deixá-las em variáveis de ambiente desprotegidas de frontends. Uma chave vazada pode permitir criação de pagamentos e saques em seu nome.
+</Warning>
+
+<Tip>
+  Rotacione suas API Keys periodicamente, especialmente após mudanças de time ou rotação de desenvolvedores. No dashboard, você pode revogar uma chave antiga e gerar uma nova em segundos.
+</Tip>
+
+## Proteção Anti-MED
+
+MED (Movimentação Eletrônica Duplicada) é uma técnica de fraude onde um ator mal-intencionado tenta realizar múltiplas transações simultâneas aproveitando janelas de latência entre sistemas. A Sync Apps protege ativamente contra esse e outros tipos de fraude.
+
+### Como funciona a proteção
+
+<Steps>
+  <Step title="Análise em tempo real">
+    Cada requisição de criação de pagamento ou saque passa por análise comportamental em milissegundos.
+  </Step>
+  <Step title="Detecção de padrões">
+    Sistemas de machine learning identificam comportamentos anômalos: múltiplos QR Codes para o mesmo CPF em segundos, variações de IP suspeitas, geolocalização inconsistente.
+  </Step>
+  <Step title="Bloqueio automático">
+    Transações suspeitas são bloqueadas antes mesmo da geração do QR Code, preservando o saldo do parceiro e evitando chargebacks.
+  </Step>
+  <Step title="Notificação ao parceiro">
+    Eventos de bloqueio são reportados via webhook com código de erro específico (`FRAUD_SUSPECTED`), permitindo que você tome ações adicionais no seu sistema.
+  </Step>
+</Steps>
+
+### Outras proteções ativas
+
+- **Rate limiting** por IP e por API Key, prevenindo abuso e brute force.
+- **Análise geográfica** de origem das requisições.
+- **Fingerprints de dispositivo** para identificar sessões suspeitas.
+- **Score de risco** atribuído a cada transação, com ação automática conforme limiar.
+
+## Monitoramento e Alertas
+
+Nosso time de operações de segurança monitora a plataforma 24 horas por dia, 7 dias por semana.
+
+### O que monitoramos
+
+- Tentativas de acesso com chaves inválidas ou expiradas
+- Picos anômalos de criação de pagamentos (possível ataque DDoS ou fraude)
+- Tempo de resposta da API (degradação pode indicar ataque)
+- Falhas de webhook (possível tentativa de exfiltração de dados)
+- Alterações de configuração críticas (novas chaves, mudança de endpoint)
+
+<Note>
+  Parceiros com planos enterprise podem configurar alertas personalizados via e-mail ou webhook quando limites de risco são atingidos. Entre em contato pelo suporte para mais detalhes.
+</Note>
+
+## Boas Práticas para Desenvolvedores
+
+Siga estas recomendações para manter sua integração robusta e segura:
+
+1. **Armazene chaves em cofres seguros** — Use AWS Secrets Manager, Azure Key Vault, HashiCorp Vault ou equivalente. Nunca em arquivos .env versionados.
+2. **Não exponha a API Key no frontend** — Todas as chamadas devem sair do seu backend. Se precisar de dados no frontend, crie endpoints próprios.
+3. **Rotacione chaves a cada 90 dias** — Estabeleça uma política interna de rotação periódica.
+4. **Valide a assinatura dos webhooks** — Sempre verifique o cabeçalho `X-Sync-Signature` antes de processar o payload.
+5. **Registre logs de auditoria** — Guarde IDs de transação, timestamps e IPs para investigação futura.
+6. **Teste sem expor dados reais** — Use valores mínimos (R\$ 1,00) em testes de produção.
+7. **Implemente rate limiting próprio** — Proteja seus endpoints públicos contra abuso, mesmo que a API da Sync Apps já tenha proteções.
+8. **Use IP allowlist quando possível** — Restrinja quais IPs podem acessar sua API pública e receber webhooks.
+9. **Revogue chaves de desligados** — Sempre que um desenvolvedor sair do time, revogue as chaves associadas.
+10. **Monitore falhas de webhook** — Falhas recorrentes podem indicar tentativa de ataque ou mau funcionamento do seu endpoint.
+
+<Warning>
+  Se você suspeitar que uma API Key foi comprometida, revogue-a **imediatamente** no dashboard e gere uma nova. Também recomendamos auditar as transações das últimas 24 horas.
+</Warning>
+
+---
+
+A segurança é uma responsabilidade compartilhada. A Sync Apps protege a infraestrutura, mas você protege suas chaves, seus endpoints e seus usuários finais. Juntos, criamos um ecossistema de pagamentos confiável!

@@ -1,0 +1,107 @@
+---
+title: "Ambientes e Testes"
+sidebarTitle: "Ambientes"
+description: "Entenda como realizar testes seguros na API Sync Apps e a diferença entre o ambiente de produção e testes."
+---
+
+A plataforma Sync Apps oferece um ambiente unificado para desenvolvimento e produção. Nesta página você aprende como testar suas integrações de forma segura, as melhores práticas para isolar credenciais e um checklist de validação antes de lançar sua integração no ambiente de produção.
+
+## Ambiente Principal
+
+Atualmente, a Sync Apps opera em um único ambiente principal. Todas as requisições são feitas para:
+
+```text
+https://api.syncpay.com.br
+```
+
+<Note>
+  Para testar de forma segura, recomendamos usar **valores mínimos** (R\$ 1,00) e chaves PIX de teste. Pagamentos e saques de valores baixos funcionam exatamente como os de produção, permitindo validar todo o fluxo sem risco financeiro significativo.
+</Note>
+
+## Boas Práticas de Teste
+
+<Steps>
+  <Step title="1. Crie uma conta de teste separada">
+    Cadastre uma conta exclusiva para desenvolvimento no [Dashboard](https://syncpay.com.br/dashboard). Isso evita que transações de teste poluam seus dados de produção.
+  </Step>
+  <Step title="2. Use valores mínimos">
+    Faça pagamentos e saques de R\$ 1,00 durante os testes. O fluxo completo (criação, QR code, confirmação, webhook) funciona igualmente para qualquer valor.
+  </Step>
+  <Step title="3. Use chaves PIX de teste">
+    Utilize suas próprias chaves PIX para testar saques. Assim você pode verificar o recebimento do dinheiro sem envolver terceiros.
+  </Step>
+  <Step title="4. Configure webhooks de teste">
+    Use URLs de webhook de desenvolvimento (ex: ngrok, webhook.site) para capturar e inspecionar os payloads durante os testes.
+  </Step>
+  <Step title="5. Simule todos os cenários">
+    Teste pagamentos confirmados, expirados, saques bem-sucedidos e com falha, além de transferências internas.
+  </Step>
+</Steps>
+
+## Isolando Keys de Teste vs Produção
+
+Nunca use a mesma API key para desenvolvimento e produção. Organize suas credenciais assim:
+
+```text
+# .env.development
+SYNC_APPS_API_KEY=dev_key_abc123
+SYNC_APPS_WEBHOOK_URL=https://webhook.site/abc123
+
+# .env.production
+SYNC_APPS_API_KEY=prod_key_xyz789
+SYNC_APPS_WEBHOOK_URL=https://seusite.com.br/webhooks/syncpay
+```
+
+<Warning>
+  **Nunca comite credenciais no repositório.** Use variáveis de ambiente e arquivos `.env` ignorados pelo `.gitignore`. Ferramentas como `dotenv` e gerenciadores de secrets (AWS Secrets Manager, HashiCorp Vault) são recomendados para produção.
+</Warning>
+
+## Checklist de Validação
+
+Antes de colocar sua integração em produção, verifique os seguintes itens:
+
+<CardGroup cols={2}>
+  <Card title="Autenticação" icon="lock">
+    API key está configurada corretamente e respondendo 200 em todas as chamadas autenticadas
+  </Card>
+
+  <Card title="Rate Limiting" icon="gauge">
+    Implementou backoff exponencial e respeita os headers `Retry-After` e `X-RateLimit-Remaining`
+  </Card>
+
+  <Card title="Tratamento de Erros" icon="shield">
+    Todos os códigos 4xx e 5xx são tratados com mensagens claras ao usuário
+  </Card>
+
+  <Card title="Webhooks" icon="bell">
+    Endpoint de webhook responde com HTTP 200 em menos de 5 segundos e valida assinatura
+  </Card>
+
+  <Card title="Idempotência" icon="rotate">
+    Usa `external_id` em saques para evitar duplicatas acidentais
+  </Card>
+
+  <Card title="Saldo" icon="wallet">
+    Consulta saldo antes de criar saques e trata `INSUFFICIENT_BALANCE` com elegância
+  </Card>
+
+  <Card title="Datas" icon="calendar">
+    Converte datas ISO 8601 para o fuso horário do usuário (UTC-3 para Brasil)
+  </Card>
+
+  <Card title="Validação" icon="check">
+    Valida chaves PIX (CPF, CNPJ, e-mail, etc.) no frontend antes de enviar à API
+  </Card>
+</CardGroup>
+
+## Próximos Passos
+
+<CardGroup cols={2}>
+  <Card title="Autenticação" icon="lock" href="/api-reference/autenticacao">
+    Reveja como obter e proteger suas API keys
+  </Card>
+
+  <Card title="Códigos de Erro" icon="triangle-exclamation" href="/api-reference/erros">
+    Consulte a referência completa de erros para tratamento defensivo
+  </Card>
+</CardGroup>
